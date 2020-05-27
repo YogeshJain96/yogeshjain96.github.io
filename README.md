@@ -4,6 +4,7 @@
 
 # Skills
 
++ Python
 + Angular 8
 + Express REST APIs
 + Spring Boot
@@ -21,7 +22,7 @@ Technology Stack: Angular 8 | Spring Boot | ExpressJs | MongoDB | MySQL
 
 Project Description : easyFood is a digital cafeteria solution, which helps the users/employees to view food available and place order via web app portal, which notifies the vendor about the orders, user then get notified when the order is ready. User can give feedback as well. Admin can monitor the generated revenue and view order details for trend analysis and inventory management. This solves the problem of long queues and saves user's time.
 
-Live Demo : https://easyfoodhome.firebaseapp.com/
+Live Demo : https://easyfoodhome.web.app
 
 Youtube Demo : https://youtu.be/g73gex_fIS4
 
@@ -31,7 +32,7 @@ Technology Stack :  ReactJs | Firebase | MaterialUI
 
 Project Description : A lightweight, superfast Web App for bookkeeping of daily Expenses designed exclusively for millennial.
 
-Live Demo : https://projectbk-518e2.firebaseapp.com/
+Live Demo : https://projectbk-518e2.web.app
 
 Youtube Demo : https://youtu.be/olhISDya54c
 
