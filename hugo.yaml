@@ -1,0 +1,237 @@
+baseURL: https://curiousone.in
+languageCode: en-us
+title: CURIOUS ONE
+theme: ["PaperModAlpha"]
+paginate: 5
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: true
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+menu:
+  main:
+    - name: Home
+      weight: 1
+    - name: About
+      url: about
+      weight: 2
+    - name: Blog
+      url: blog
+      weight: 3
+    - name: Search
+      url: search
+      weight: 4
+params:
+  env: production
+  description: "Digital webspace of Yogesh Jain - Curious One"
+  author: Yogesh Jain
+  defaultTheme: auto
+  ShowReadingTime: true
+  ShowShareButtons: false
+  # ShareButtons: ["linkedin", "twitter"]
+  ShowPostNavLinks: true
+  # ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowToc: true
+  TocSide: right
+  TocOpen: false
+  images: ["logo.png"]
+  homeInfoParams:
+    showWaveIcon: true
+    Title: Hey!
+    showTerminalWindow: true
+    terminalQuery: whoami
+    terminalResponse: |
+      Hello, I'm Yogesh. A Curious, Full Stack Developer!
+    Content: |
+      `Welcome to my web home address!`
+
+      `This personal blogsite is a window into my world.` [<ins>`know more...`</ins>](./about)
+    showSocialIcons: false
+    showTags: true
+    tagsTitle: |
+      `You can find blogs about:`
+  about:
+    showSocialIcons: true
+    # imageUrl: "https://avatars.githubusercontent.com/u/54388005"
+    imageUrl: "images/profile.png"
+    imageTitle: Yogesh Jain
+    imageWidth: 250
+    imageHeight: 250
+    # imageCaption: "Captured by [NA](#)"
+    aboutInfo: |
+      ### Hello, I’m Yogesh Jain 👋
+
+      This personal blogsite is a window into my world as a tech enthusiast and a curious full stack developer.
+
+      I write about a wide range of topics, from tech stuffs that keep me up at night, to the goals in life that keep me inspired. You can use [search](/search) / [tags](/tags) page to find posts about specific topic.
+
+      You can learn more about my professional experience via my [LinkedIn profile](https://www.linkedin.com/in/yogeshjain96).
+
+      > Checkout **[my timeline](/timeline)** to know more about me!
+    contactInfo: |
+      You can reach out to me via email `contactyogeshjain[at]gmail[dot]com`  
+      _For blog post updates, subscribe to the site's [RSS feed <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 11a9 9 0 0 1 9 9" />
+          <path d="M4 4a16 16 0 0 1 16 16" />
+          <circle cx="5" cy="19" r="1" />
+      </svg>](https://curiousone.in/blog/index.xml)_
+  timeline:
+    - year: "2024..."
+      events:
+        - |
+          `More coming soon..`
+        - |
+          ### Started Blogging
+          `Feb`
+          Started writing technical blogs to share my wisdom.
+        - |
+          ### Crafted my personal blogsite 
+           `Jan`
+          Crafted a personal blogsite for brain dump of my learnings and techincal notes.
+
+          🔗 [curiousone.in](https://curiousone.in)
+    - year: "2023"
+      events:
+        - |
+          #### TODO
+          `wip`
+    - year: "2022"
+      events:
+        - |
+          #### TODO
+          `wip`
+    - year: "2021"
+      events:
+        - |
+          #### TODO
+          `wip`
+    - year: "2020"
+      events:
+        - |
+          ### CDAC ACTS  🎓
+          `Post-Grad` `advance-computing` 
+          <details>
+            <summary><u>Project Details</u></summary>
+            <p>easyFood</p>
+          </details>
+
+        - |
+          ### Joined EDB 👨‍💻
+          `python` `flask` `postgreSQL`  
+          Joined EnterpriseDB as a Full Stack Developer!
+
+        - |
+          ### Lockdown 🔒
+          - TODO
+
+    - year: "2019"
+      events:
+        - |
+          ### Joined Accenture 👨‍💻
+          - Joined Accenture - Pune Office
+          - Started working on MS-SQL, React & NodeJS
+          - Learned corporate cultures
+        - |
+          #### Project BahiKhata
+          `ReactJS` `firebase`
+          <details>
+            <summary><u>Project Details</u></summary>
+            <p>Bahi Khata App to track daily expenses </p>
+          </details>
+
+    - year: "2018"
+      events:
+        - |
+          ### Graduated 🎓
+          `2014-2018` `8.7 CGPA`  
+          Completed engineering with distinction! 🚀
+        - |
+          ### Internship at Reva Solutions 👨‍💻
+          `Internship` `Hyderabad`
+          - Joined as an intern in Reva Solutions, Hyderabad
+          <details>
+            <summary><u> Project </u></summary>
+            <p> Developed a ECM to manage BOX's content using .NET MVC Core and Microsoft SQL. Used Azure Active Directory for Authorization and deployed the app on Azure. </p>
+          </details>
+    - year: "2017"
+      events:
+        - |
+          ### Grand Finalist in SIH'17 👨‍💻
+          `Hackathon` `Manipal` `GOI`
+
+          Grand Finalist in Smart India Hackathon conducted by Government of India
+        - |
+          ### IoT at iBHubs, Bengaluru 👨‍💻
+          `Internship` `Training` `IoT`  
+          Internship + Training in IoT(Internet of things) iBHubs in Bengaluru
+    - year: "2016"
+      events:
+        - |
+          ### Won Hackathon Codeutsav 1.0 🏆
+          `Hackathon` `UNICEF` `NIT-R`
+          2nd Runner up in Codeutsav 1.0 conducted by UNICEF in NIT-Raipur
+          & won some cash prizes!
+        - |
+          ### Started Milega Solution 👨‍💻
+          `milegasolution.com`
+          - Started a pilot project to help students find basic needs like accommodation, foods by listing vendors
+          - Generated some revenue via vendor's promotion in platform
+    - year: "2015"
+      events:
+        - |
+          ### Trip to IIT-Bombay
+          `IIT-B` `Mood Inigo` `E-Cell`
+          - Attended Mood Indigo fest in IIT-Bombay
+          - Became campus ambasdoor of E-Cell, IIT-B
+        - |
+          ### Finalist in National Startup Case Study Challenge
+          `IIT-K` `E-Cell`
+          - Finalist in National Startup Case Study Challenge in IIT-Kharagpur
+          - Became campus ambasdoor of E-Cell, IIT-K
+    - year: "2014"
+      events:
+        - |
+          ### Joined College
+          `NSS` `IEEE` `E-Cell`
+
+          Joined NSS (National Service Scheme), IEEE, E-Cell, Akshaypatra..
+        - |
+          ### Completed High-School
+          `90%`
+          Completed High-School in Physcics, Chemistry, Maths + Computer Science
+        - |
+          ### Won ED-Marker Cup 🏆
+          Won ED-Marker Cup for proficiency in computer science 🚀
+    - year: "2012"
+      events:
+        - |
+          ### Appointed as Computer Literacy Secratary
+          `2012-2014`
+          Appointed as computer literacy secratary in my High-School.
+  socialIcons:
+    - name: "linkedin"
+      url: "https://www.linkedin.com/in/yogeshjain96/"
+    - name: "github"
+      url: "https://github.com/yogeshjain96"
+    - name: "instagram"
+      url: "https://www.instagram.com/curiousone.in"
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: false
+    minMatchCharLength: 0
+    keys: ["title", "permalink", "summary", "content"]
+services:
+  googleAnalytics:
+    ID: G-KWZGMVP78Q
