@@ -37,9 +37,10 @@ params:
   defaultTheme: auto
   ShowReadingTime: true
   ShowShareButtons: false
+  # ShowWordCount: true
   # ShareButtons: ["linkedin", "twitter"]
-  ShowPostNavLinks: true
   # ShowBreadCrumbs: true
+  ShowPostNavLinks: true
   ShowCodeCopyButtons: true
   ShowRssButtonInSectionTermList: true
   ShowToc: true
@@ -68,9 +69,9 @@ params:
     imageTitle: Yogesh Jain
     imageWidth: 250
     imageHeight: 250
-    # imageCaption: "Captured by [NA](#)"
+    imageCaption: "*That's me!*"
     aboutInfo: |
-      ### Hello, I’m Yogesh Jain 👋
+      ### Hello, I’m Yogesh Jain <div class="wave">👋</div>
 
       This personal blogsite is a window into my world as a tech enthusiast and a curious full stack developer.
 
@@ -87,6 +88,7 @@ params:
           <path d="M4 4a16 16 0 0 1 16 16" />
           <circle cx="5" cy="19" r="1" />
       </svg>](https://curiousone.in/blog/index.xml)_
+      <img class="toggleDarkMode" draggable="false" style="float: right;" src="https://curiousone.in/logo-transparent.png" alt="curious one logo" title="curious one logo" height="120" width="120" />
   timeline:
     - year: "2024..."
       events:

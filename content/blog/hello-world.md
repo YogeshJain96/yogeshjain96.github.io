@@ -2,119 +2,30 @@
 author: ["Yogesh Jain"]
 title: "Hello World!"
 date: "2024-01-22"
-description: "How it all started!"
-tags: ["tech", "product"]
+description: "Embark on a journey of curiosity with me, as I share new ideas, challenge norms, and share insights."
+tags: ["tech", "life"]
 cover:
   image: images/214.png
 ---
 
-`Something cool coming soon!`
+In my early years of programming I would build things all the time (for fun). Just random projects I'm curious about, which didn't necessarily solve any specific problems. I learned a ton doing that. I’ve been wanting to get back to my roots and build something new for myself. It starts with the creation of this new site `Curious One`. A place where I can share about various topics (mostly development related) that come up in my life, in the simplest way possible, along with some tutorials and other things including my weekend hobby projects. Hope you enjoy it!
 
-# TODO
+### Why I choose to blog!
 
-This article offers a sample of basic Markdown syntax that can be used in Hugo content files, also it shows whether basic HTML elements are decorated with CSS in a Hugo theme.
+#### Enlightened Reflections
 
-<!--more-->
+One of the things that wasn’t clear to me before starting a blog was how much it would help me understand my thoughts and feelings. There is nothing better than writing about something that has been stewing around in my head for days or weeks.
 
-## Headings
+Writing about a subject helps because writing is hard. Harder than you probably expect. Writing requires a strong understanding of the subject at hand, which forces critical thinking and questioning. For objective topics like programming this helps to increase understanding of the facts and data, while writing about personal experiences helps to understand thoughts and feelings.
 
-The following HTML `<h1>`—`<h6>` elements represent six levels of section headings. `<h1>` is the highest section level while `<h6>` is the lowest.
+#### Making the World Better, One Solution at a Time
 
-# H1
+Another motivation behind starting this blogsite is to offer assistance to fellow curious folks. I find great fulfillment in acquiring new knowledge and feel compelled to share it with others. After spending hours on a solution to a hard problem it feels good to write a blog post detailing what went wrong, and how I solved it. I do this with hope that someone with the same problem will find my post and save themselves a lot of time and frustration.
 
-## H2
+### Why the name `Curious One`
 
-### H3
+Honestly, I've been called the `Curious One` since my school days because of my love for asking questions and seeking out knowledge about almost everything around me. Even in college, I was always on the move, attending conferences, workshops, and hackathons. That's why my friends there dubbed me the `Curious Traveler`. I have a natural urge to explore and discover new things and question the status quo.
 
-#### H4
+### Site's Tech Stack Overview
 
-##### H5
-
-###### H6
-
-## Paragraph
-
-Xerum, quo qui aut unt expliquam qui dolut labo. Aque venitatiusda cum, voluptionse latur sitiae dolessi aut parist aut dollo enim qui voluptate ma dolestendit peritin re plis aut quas inctum laceat est volestemque commosa as cus endigna tectur, offic to cor sequas etum rerum idem sintibus eiur? Quianimin porecus evelectur, cum que nis nust voloribus ratem aut omnimi, sitatur? Quiatem. Nam, omnis sum am facea corem alique molestrunt et eos evelece arcillit ut aut eos eos nus, sin conecerem erum fuga. Ri oditatquam, ad quibus unda veliamenimin cusam et facea ipsamus es exerum sitate dolores editium rerore eost, temped molorro ratiae volorro te reribus dolorer sperchicium faceata tiustia prat.
-
-Itatur? Quiatae cullecum rem ent aut odis in re eossequodi nonsequ idebis ne sapicia is sinveli squiatum, core et que aut hariosam ex eat.
-
-## Blockquotes
-
-The blockquote element represents content that is quoted from another source, optionally with a citation which must be within a `footer` or `cite` element, and optionally with in-line changes such as annotations and abbreviations.
-
-#### Blockquote without attribution
-
-> Tiam, ad mint andaepu dandae nostion secatur sequo quae.
-> **Note** that you can use _Markdown syntax_ within a blockquote.
-
-#### Blockquote with attribution
-
-> Don't communicate by sharing memory, share memory by communicating.
->
-> — <cite>Rob Pike[^1]</cite>
-
-[^1]: The above quote is excerpted from Rob Pike's [talk](https://www.youtube.com/watch?v=PAAkCSZUG1c) during Gopherfest, November 18, 2015.
-
-## Tables
-
-Tables aren't part of the core Markdown spec, but Hugo supports them out-of-the-box.
-
-| Name  | Age |
-| ----- | --- |
-| Bob   | 27  |
-| Alice | 23  |
-
-#### Inline Markdown within tables
-
-| Italics   | Bold     | Code   |
-| --------- | -------- | ------ |
-| _italics_ | **bold** | `code` |
-
-## List Types
-
-#### Ordered List
-
-1. First item
-2. Second item
-3. Third item
-
-#### Unordered List
-
-- List item
-- Another item
-- And another item
-
-#### Nested Unordered list
-
-- Fruit
-  - Apple
-  - Orange
-  - Banana
-- Dairy
-  - Milk
-  - Cheese
-
-#### Nested Ordered list
-
-1. Fruit
-    - Apple
-    - Orange
-    - Banana
-2. Dairy
-    1. Milk
-    2. Cheese
-3. Third item
-    1. Sub One
-    2. Sub Two
-
-## Other Elements — abbr, sub, sup, kbd, mark
-
-<abbr title="Graphics Interchange Format">GIF</abbr> is a bitmap image format.
-
-H<sub>2</sub>O
-
-X<sup>n</sup> + Y<sup>n</sup> = Z<sup>n</sup>
-
-Press <kbd><kbd>CTRL</kbd>+<kbd>ALT</kbd>+<kbd>Delete</kbd></kbd> to end the session.
-
-Most <mark>salamanders</mark> are nocturnal, and hunt for insects, worms, and other small creatures.
+This is a simple static site built using [goHugo](https://gohugo.io/) with the custom refined [PaperModAlpha](https://github.com/YogeshJain96/PaperModAlpha/) theme, hosted on [github pages](https://pages.github.com/). Nothing fancy.
