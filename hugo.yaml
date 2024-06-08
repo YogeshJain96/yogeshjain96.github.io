@@ -114,6 +114,18 @@ params:
         - |
           #### TODO
           `wip`
+        - |
+          #### Hobby Project - easyWish 🎂
+          `easyWish` `HR-Tool` `EDB`
+          Developed a tool for EDB HR department to automate birthday/anniversary emails and slack messages to employees
+          <details>
+            <summary><u>Design</u></summary>
+            <p>
+            - HR feeds the data in google sheet with employee's details<br>
+            - Python script runs daily via github action cron job to fetch the latest gsheet data & send emails/ slack messages accordingly<br>
+            </p>
+            <img src="/images/timeline/easyWish.png" alt="easyWish - Design" title="easyWish - Design" />
+          </details>
     - year: "2021"
       events:
         - |
@@ -123,10 +135,13 @@ params:
       events:
         - |
           ### CDAC ACTS  🎓
-          `Post-Grad` `advance-computing` 
+          `Post-Grad` `advance-computing`
+          Completed Post-Grad in Advance Computing from CDAC `Centre for Development of Advanced Computing` ACTS, HeadQuarters, Pune
           <details>
             <summary><u>Project Details</u></summary>
-            <p>easyFood</p>
+            <p>easyFood - I got this idea while waiting in long queues to order food at the on-premise cafeteria in Accenture</p>
+            <p>easyFood is a digital cafeteria solution, which helps the users/employees to view food available and place order via web app portal, which notifies the vendor about the orders, user then get notified when the order is ready. User can give feedback as well. Admin can monitor the generated revenue and view order details for trend analysis and inventory management. This solves the problem of long queues and saves user's time</p>
+            {{< youtube g73gex_fIS4 >}}
           </details>
 
         - |
@@ -136,7 +151,13 @@ params:
 
         - |
           ### Lockdown 🔒
-          - TODO
+          - Started Cycling 🚴‍♂
+          - Played Bad️minton 🏸
+          - Learned Cooking 🍳
+          - Read books 📚
+          - Developed couple of tech projects as hobby 👨‍💻
+            - Covid-19 Tracker to track cases focused on CG
+            - Habbit Tracker to introscpect my daily goals
 
     - year: "2019"
       events:
@@ -146,11 +167,13 @@ params:
           - Started working on MS-SQL, React & NodeJS
           - Learned corporate cultures
         - |
-          #### Project BahiKhata
-          `ReactJS` `firebase`
+          #### Hobby Project - Bahi Khaata 📝
+          `ReactJS` `firebase` `MaterialUI`
           <details>
             <summary><u>Project Details</u></summary>
-            <p>Bahi Khata App to track daily expenses </p>
+            <p>Bahi Khaata is a lightweight, superfast Web App for bookkeeping of daily Expenses designed exclusively for millennial</p>
+            <p>Felt the need for self use, hence developed</p>
+            {{< youtube olhISDya54c >}}
           </details>
 
     - year: "2018"
@@ -162,15 +185,20 @@ params:
         - |
           ### Internship at Reva Solutions 👨‍💻
           `Internship` `Hyderabad`
-          - Joined as an intern in Reva Solutions, Hyderabad
+          Joined as an intern in Reva Solutions, Hyderabad to develop a ECM using Box.com's SDK, Azure AD
           <details>
             <summary><u> Project </u></summary>
             <p> Developed a ECM to manage BOX's content using .NET MVC Core and Microsoft SQL. Used Azure Active Directory for Authorization and deployed the app on Azure. </p>
           </details>
+        - |
+          ### Joined an ED-tech Startup 👨‍💻
+          `Job` `Bengaluru`
+          - Joined as an Associate, managing multiple things
+          - Primarly worked on CRM tools, configuring and managing lead funnels
     - year: "2017"
       events:
         - |
-          ### Grand Finalist in SIH'17 👨‍💻
+          ### Grand Finalist in SIH'17 🚀
           `Hackathon` `Manipal` `GOI`
 
           Grand Finalist in Smart India Hackathon conducted by Government of India
@@ -178,6 +206,16 @@ params:
           ### IoT at iBHubs, Bengaluru 👨‍💻
           `Internship` `Training` `IoT`  
           Internship + Training in IoT(Internet of things) iBHubs in Bengaluru
+        - |
+          #### Hobby Project - Home Automation 🏠
+          `IoT` `Home Automation` `Arduino` `MIT App inventor 2`
+          <details>
+            <summary><u>Project Details</u></summary>
+            <p>Home Automation - Automated my College Room</p>
+            <p>Developed a Hardware kit along with an Android app to completely automate my room, integrated google TTS engine which supported my voice command as well</p>
+            <p>Made the app using MIT App inventor 2 and the hardware kit using Arduino + WiFi + Bluetooth Module + Relays & plugged it to my room switch-boarde</p>
+            {{< youtube X8M8pulCNtw >}}
+          </details>
     - year: "2016"
       events:
         - |
@@ -189,28 +227,28 @@ params:
           ### Started Milega Solution 👨‍💻
           `milegasolution.com`
           - Started a pilot project to help students find basic needs like accommodation, foods by listing vendors
-          - Generated some revenue via vendor's promotion in platform
+          - Generated some revenue via vendor's referral & promotion in platform
     - year: "2015"
       events:
         - |
-          ### Trip to IIT-Bombay
+          ### Attended Mood Inigo @ IIT-Bombay 🚀
           `IIT-B` `Mood Inigo` `E-Cell`
           - Attended Mood Indigo fest in IIT-Bombay
-          - Became campus ambasdoor of E-Cell, IIT-B
+          - Became campus ambassador of E-Cell, IIT-B
         - |
-          ### Finalist in National Startup Case Study Challenge
+          ### Finalist in National Startup Case Study Challenge 🚀
           `IIT-K` `E-Cell`
           - Finalist in National Startup Case Study Challenge in IIT-Kharagpur
-          - Became campus ambasdoor of E-Cell, IIT-K
+          - Became campus ambassador of E-Cell, IIT-K
     - year: "2014"
       events:
         - |
-          ### Joined College
+          ### Joined College 🎓
           `NSS` `IEEE` `E-Cell`
 
           Joined NSS (National Service Scheme), IEEE, E-Cell, Akshaypatra..
         - |
-          ### Completed High-School
+          ### Completed High-School 📚
           `90%`
           Completed High-School in Physcics, Chemistry, Maths + Computer Science
         - |
@@ -219,7 +257,7 @@ params:
     - year: "2012"
       events:
         - |
-          ### Appointed as Computer Literacy Secratary
+          ### Appointed as Computer Literacy Secratary 💻
           `2012-2014`
           Appointed as computer literacy secratary in my High-School.
   socialIcons:
