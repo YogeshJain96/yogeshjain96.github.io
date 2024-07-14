@@ -1,5 +1,5 @@
 ---
-title: "How Base64 Encoding Works"
+title: "How Base64 Encoding Works?"
 date: 2024-03-15T23:09:45+05:30
 description: "Let's understand the Base64 Encoding under the hood"
 tags: ["how-it-works", "base64", "encoding"]
