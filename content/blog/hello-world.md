@@ -8,7 +8,7 @@ cover:
   image: images/hello-world.png
 ---
 
-In my early years of programming, I constantly built random projects out of curiosity and for fun, exploring various ideas that crossed my mind. I learned a ton doing that. I’ve been wanting to get back to my roots and build something new for myself. It starts with the creation of this new site `Curious One`. A place where I can share about various topics (mostly development related) that come up in my life, in the simplest way possible, along with some tutorials and other things including my weekend hobby projects. Hope you enjoy it!
+In my early years of programming, I constantly built random projects out of curiosity and for fun, exploring various ideas that crossed my mind. I learned a ton doing that. I’ve been wanting to get back to my roots and build something new for myself. It starts with the creation of this new site `Curious One`. A place where I can share about various topics (mostly tech related) that come up in my life, in the simplest way possible, along with some tutorials and other things including my weekend hobby projects. Hope you enjoy it!
 
 ### Why I choose to blog!
 

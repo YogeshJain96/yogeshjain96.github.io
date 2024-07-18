@@ -71,7 +71,7 @@ Ensuring the security of webhooks is crucial to prevent unauthorized access and 
 | **Webhook Payload Corruption**                  | Verify messages using HMAC signatures.         |
 | **Replay Attacks**                              | Use timestamped messages to prevent replay attacks. |
 
-For more detailed explanations of these security threats and their solutions, you can refer to [this blog on webhook security](https://hookdeck.com/webhooks/guides/webhooks-security-checklist).
+For more detailed explanations of these security threats and their solutions, you can refer to <a href="https://hookdeck.com/webhooks/guides/webhooks-security-checklist" target="_blank">this blog on webhook security</a>.
 
 ### A simple Webhook implementation in Go
 
