@@ -1,7 +1,7 @@
 ---
 title: "Dockerfile - Entrypoint vs CMD"
 date: 2024-06-14T14:15:20+05:30
-description: "Let's understand what's the diffence between Entrypoint and CMD in Dockerfile"
+description: "Let's understand what's the diffence between Entrypoint and CMD in Dockerfile."
 tags: ["dockerfile", "docker image"]
 cover:
   image: images/dockerfile-entrypoint-vs-cmd/cover.png
