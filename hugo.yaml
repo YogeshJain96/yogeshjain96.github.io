@@ -64,7 +64,6 @@ params:
       `You can find blogs about:`
   about:
     showSocialIcons: true
-    # imageUrl: "https://avatars.githubusercontent.com/u/54388005"
     imageUrl: "images/profile.png"
     imageTitle: Yogesh Jain
     imageWidth: 250
@@ -77,9 +76,7 @@ params:
 
       I write about a wide range of topics, from tech stuffs that keep me up at night, to the goals in life that keep me inspired. You can use [search](/search) / [tags](/tags) page to find posts about specific topic.
 
-      You can learn more about my professional experience via my [LinkedIn profile](https://www.linkedin.com/in/yogeshjain96).
-
-      > Checkout **[my timeline](/timeline)** to know more about me!
+      > Checkout **[my timeline 🌱](/timeline)** to know more about me!
     contactInfo: |
       You can reach out to me via email `contactyogeshjain[at]gmail[dot]com`  
       _For blog post updates, subscribe to the site's [RSS feed <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -88,7 +85,7 @@ params:
           <path d="M4 4a16 16 0 0 1 16 16" />
           <circle cx="5" cy="19" r="1" />
       </svg>](https://curiousone.in/blog/index.xml)_
-      <img class="toggleDarkMode" draggable="false" style="float: right;" src="https://curiousone.in/logo-transparent.png" alt="curious one logo" title="curious one logo" height="120" width="120" />
+      <img class="toggleDarkMode" draggable="false" style="float: right;" src="../logo-transparent.png" alt="curious one logo" title="curious one logo" height="120" width="120" />
   timeline:
     - year: "2024..."
       events:
