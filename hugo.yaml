@@ -2,7 +2,6 @@ baseURL: https://curiousone.in
 languageCode: en-us
 title: CURIOUS ONE
 theme: ["PaperModAlpha"]
-paginate: 5
 enableRobotsTXT: true
 buildDrafts: false
 buildFuture: false
@@ -12,6 +11,8 @@ markup:
   goldmark:
     renderer:
       unsafe: true
+pagination:
+  pagerSize: 5
 outputs:
   home:
     - HTML
@@ -64,7 +65,7 @@ params:
       `You can find blogs about:`
   about:
     showSocialIcons: true
-    imageUrl: "images/profile.png"
+    imageUrl: "profile.jpeg"
     imageTitle: Yogesh Jain
     imageWidth: 250
     imageHeight: 250
@@ -76,7 +77,6 @@ params:
 
       I write about a wide range of topics, from tech stuffs that keep me up at night, to the goals in life that keep me inspired. You can use [search](/search) / [tags](/tags) page to find posts about specific topic.
 
-      > Checkout **[my timeline 🌱](/timeline)** to know more about me!
     contactInfo: |
       You can reach out to me via email `contactyogeshjain[at]gmail[dot]com`  
       _For blog post updates, subscribe to the site's [RSS feed <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
