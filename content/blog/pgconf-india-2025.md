@@ -1,7 +1,7 @@
 ---
 title: "PG Conf India 2025"
 date: 2025-03-14T23:07:43+05:30
-description: "A deep dive into my experience at Postgres Conference India 2025—insightful talks, in-person connections, and the evolving future of Postgres."
+description: "A deep dive into my experience at Postgres Conference India 2025 - insightful talks, in-person interaction, and the evolving future of Postgres."
 tags: ["PGConfIndia"]
 cover:
   image: images/pgconf-india-2025/cover.png
@@ -25,7 +25,7 @@ Had the privilege of meeting **legendary Postgres contributors** and reconnectin
 - ✅ Understanding **Throughput vs Recall** in vector search to balance cost vs performance
 - ✅ Advanced **Postgres monitoring** with pgWatch 🔍
 
-### 🎤 𝗛𝗼𝘂𝘀𝗲𝗳𝘂𝗹𝗹 𝗖𝗹𝗼𝘂𝗱𝗡𝗮𝘁𝗶𝘃𝗲𝗣𝗚 𝗧𝗿𝗮𝗶𝗻𝗶𝗻𝗴!
+### 🎤 Housefull CloudNativePG Training!
 
 One of the biggest highlights - my colleagues delivered a packed session on running Postgres on Kubernetes with CloudNativePG
 
@@ -35,15 +35,19 @@ One of the biggest highlights - my colleagues delivered a packed session on runn
 - ✅ Monitoring, automated backups & PITR recovery 📊
 - ✅ Scaling, switchovers & failovers for production-ready Postgres 💪
 
-Huge shoutout to the PGConf India team, EDB, and all sponsors for making this event a grand success!
+Huge shoutout to the <a href="https://pgconf.in/" target="_blank">PGConf India</a> team, EDB, and all sponsors for making this event a grand success!
 
 Can’t wait for more such learning & collaboration!
 
-### Some Event Snaps 📸
+### 📸 Some Event Snaps
 
 {{< slider >}}
-/images/pgconf-india-2025/me.jpeg
-/images/pgconf-india-2025/with-bruce-and-team.jpeg
-/images/pgconf-india-2025/with-tom-and-team.jpeg
-/images/pgconf-india-2025/pgconf-india-group.jpeg
+/images/pgconf-india-2025/me.jpeg|Me @ PGConf India 2025
+/images/pgconf-india-2025/with-bruce-and-team.jpeg|With Bruce and Team
+/images/pgconf-india-2025/with-tom-and-team.jpeg|With Tom and Team
+/images/pgconf-india-2025/with-pem-team.jpeg|With PEM Team
+/images/pgconf-india-2025/with-biganimal-team.jpeg|With BigAnimal Team
+/images/pgconf-india-2025/pgconf-india-group.jpeg|PGConf India 2025 Group Photo
 {{< /slider >}}
+
+<a href="https://www.linkedin.com/posts/yogeshjain96_postgresql-edb-pgconfindia-activity-7305279078905896960-3muP" target="_blank">🔗 LinkedIn Post</a>
