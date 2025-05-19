@@ -57,4 +57,10 @@ A big thank you to the amazing <a href="https://pgconf.org.np/" target="_blank">
 
 Can’t wait to be back in Nepal — for more learning, meeting the community, and exploring mountains! 🏔️
 
-<a href="https://www.linkedin.com/posts/yogeshjain96_pgconfnepal-postgres-opentelemetry-activity-7329540358109921282-l6m3" target="_blank">🔗 LinkedIn Post</a>
+**🔗 Links:**
+
+- <a href="https://www.enterprisedb.com/event/postgres-conference-nepal" target="_blank">EDB Event Post</a>
+
+- <a href="https://www.linkedin.com/posts/yogeshjain96_pgconfnepal-postgres-opentelemetry-activity-7329540358109921282-l6m3" target="_blank">My LinkedIn Post</a>
+
+- <a href="https://pgconf.org.np/" target="_blank">PGConf Event Website</a>
