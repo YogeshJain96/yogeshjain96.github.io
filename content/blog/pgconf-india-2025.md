@@ -2,7 +2,7 @@
 title: "Attended PG Conf India 2025"
 date: 2025-03-14T23:07:43+05:30
 description: "A deep dive into my experience at Postgres Conference India 2025 - insightful talks, in-person interaction, and the evolving future of Postgres."
-tags: ["PGConfIndia"]
+tags: ["postgres", "conference", "india", "PGConfIndia"]
 cover:
   image: images/pgconf-india-2025/cover.png
 ---

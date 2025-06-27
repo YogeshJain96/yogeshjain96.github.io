@@ -2,7 +2,7 @@
 title: 'How PostgreSQL Works'
 date: 2024-03-15T23:07:43+05:30
 description: "PostgreSQL under the hood"
-tags: ["how-it-works", "postgres"]
+tags: ["how-it-works", "postgres", "tech"]
 draft: true
 cover:
   image: images/how-postgresql-works/cover.png

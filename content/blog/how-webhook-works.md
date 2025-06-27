@@ -2,7 +2,7 @@
 title: "How Webhook Works?"
 date: 2024-04-12T15:18:25+05:30
 description: "Let's understand how webhook works under the hood."
-tags: ["how-it-works", "webhook"]
+tags: ["how-it-works", "webhook", "tech"]
 cover:
   image: images/how-webhook-works/cover.png
 ---

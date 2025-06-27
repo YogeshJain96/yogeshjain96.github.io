@@ -330,6 +330,8 @@ params:
       url: "https://www.linkedin.com/in/yogeshjain96/"
     - name: "github"
       url: "https://github.com/yogeshjain96"
+    - name: "email"
+      url: "mailto:contactyogeshjain@gmail.com"
   fuseOpts:
     isCaseSensitive: false
     shouldSort: false
