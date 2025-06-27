@@ -1,0 +1,14 @@
+showWaveIcon: true
+Title: Hey!
+showTerminalWindow: true
+terminalQuery: whoami
+terminalResponse: |
+  Hello, I'm Yogesh. A Curious, Full Stack Developer!
+Content: |
+  `Welcome to my web home address!`
+
+  `This personal blogsite is a collection of things I find interesting ` [<ins>`know more about me..`</ins>](./about)
+showSocialIcons: false
+showTags: true
+tagsTitle: |
+  `You can find blogs about:`
