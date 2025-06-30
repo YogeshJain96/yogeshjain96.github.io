@@ -3,6 +3,19 @@
     - |
       `More coming soon..`
     - |
+      #### Crafted **"PaperEvent"** Hugo theme for PG Pune Meetups 🛠️ 🐘
+      `Hugo Theme` `PaperEvent` `PG Pune`
+
+      ✨ Crafted <a href="https://github.com/YogeshJain96/hugo-paper-event" target="_blank">**PaperEvent**</a> — a Hugo theme tailored for conferences and community meetups like <a href="https://pgpune.in/" target="_blank">Postgres Pune</a>.
+      It provides a clean, modern layout to rapidly build event sites using <a href="https://gohugo.io/" target="_blank">GoHugo</a>.
+
+      <details>
+        <summary><u>Explore the Theme</u></summary>
+        <strong>Live Demo:</strong> <a href="https://pgpune.in/" target="_blank">pgpune.in</a>
+
+        <strong>Repo:</strong> <a href="https://github.com/YogeshJain96/hugo-paper-event" target="_blank">GitHub - hugo-paper-event</a>
+      </details>
+    - |
       ### Spoke at PGConf Nepal 2025 🎤 🐘
       `Speaker` `PGConf` `Nepal` `Kathmandu University`
 
@@ -11,6 +24,8 @@
         <summary><u>Talk Details</u></summary>
         <p><strong>Title:</strong> Unified Observability: Monitoring Postgres Anywhere with OpenTelemetry</p>
         <strong>Recording:</strong>{{< youtube ZUPJBz2NS-o >}}
+        
+        More details in <a href="https://curiousone.in/blog/pgconf-nepal-2025/" target="_blank">my blog post here 🔗</a>
       </details>
     - |
       #### Attended PG Conf India 2025 🐘
