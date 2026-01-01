@@ -1,7 +1,64 @@
-- year: "2025..."
+- year: "2026..."
   events:
     - |
-      `More coming soon..`
+      `Tinkering... 👨‍💻`
+- year: "2025"
+  events:
+    - |
+      ### Won Innovation Champion Award @ EDB  🏆
+      `Awarded` `Innovation Champion` `EDB` `Pune`
+
+      🏆 Truly honoured to receive the "𝗜𝗻𝗻𝗼𝘃𝗮𝘁𝗶𝗼𝗻 𝗖𝗵𝗮𝗺𝗽𝗶𝗼𝗻 𝗔𝘄𝗮𝗿𝗱" at EDB End of Year, India Event!💡
+      <details>
+        <summary><u>More Details</u></summary>
+        <img src="/images/timeline/innovation_champion_award.jpeg" alt="Innovation Champion Award - Yogesh Jain" title="Innovation Champion Award - Yogesh Jain" />
+        <img src="/images/timeline/innovation_champion_certificate.jpeg" alt="Innovation Champion Certificate - Yogesh Jain" title="Innovation Champion Certificate - Yogesh Jain" />
+        More details in <a href="https://www.linkedin.com/posts/yogeshjain96_innovation-gratitude-motivation-activity-7392616090130006017-en6j/" target="_blank">My LinkedIn post 🔗</a>
+      </details>
+    - |
+      ### Spoke at PGConf Europe 2025 🎤 🐘
+      `Speaker` `PGConf` `Europe` `Riga` `Latvia`
+
+      🚀 Had the opportunity to speak at <a href="https://2025.pgconf.eu/" target="_blank">PGConf Europe</a> 2025, held at Riga, Latvia, where I shared insights on Unified Observability using OpenTelemetry along with some potential MCP integration usecases.
+      <details>
+        <summary><u>Talk Details</u></summary>
+        <p><strong>Title:</strong> Unified Observability: Monitoring Postgres Anywhere with OpenTelemetry</p>
+        <strong>Recording:</strong>{{< youtube b9p2J3JIJho >}}
+        
+        More details in <a href="https://www.postgresql.eu/events/pgconfeu2025/sessions/session/7035-unified-observability-monitoring-postgres-anywhere-with-opentelemetry/" target="_blank">postgresql.eu page here 🔗</a>
+      </details>
+    - |
+      ### Spoke at HYD PGDay 2025 🎤 🐘
+      `Speaker` `PGDay` `Hyderabad` `JNTUH`
+
+      🚀 Had the opportunity to speak at <a href="https://pghyd.in/hyd-pgdays-2025/" target="_blank">PGDay Hyderabad</a> 2025, held at Jawaharlal Technological University, Hyderabad.
+      <details>
+        <summary><u>Talk Details</u></summary>
+        <p><strong>Title:</strong> Unified Observability: Monitoring Postgres Anywhere with OpenTelemetry</p>
+        <strong>Recording:</strong>{{< youtube AzcoKaXN8Os >}}
+        
+        More details in <a href="https://pghyd.in/hyd-pgdays-2025/" target="_blank">pghyd.in page here 🔗</a>
+      </details>
+    - |
+      #### Attended Kubecon India 2025 🐘
+      `Kubecon` `CloudNativeCon` `Hyderabad` `India`
+
+      🔥 My First-ever #KubeCon + #CloudNativeCon India 2025 - what an incredible experience! 💡
+
+      🚀 Learned so much about #Observability, deploying & scaling LLMs in Kubernetes, and got to meet some amazing folks.
+
+      More details in <a href="https://www.linkedin.com/posts/yogeshjain96_kubecon-cloudnativecon-observability-activity-7360867643102244864-oiU0" target="_blank">My LinkedIn post 🔗</a>
+    - |
+      ### Spoke at PG Pune Meetup 2025 🎤 🐘
+      `Speaker` `PG Meetup` `Pune` `Nutanix`
+
+      🚀 Had the opportunity to speak at <a href="https://pgpune.in" target="_blank">PG Meetup Pune</a> 2025, held at Nutanix,Pune.
+      <details>
+        <summary><u>Talk Details</u></summary>
+        <p><strong>Title:</strong> Unified Observability: Monitoring Postgres Anywhere with OpenTelemetry</p>
+        
+        More details in <a href="https://www.linkedin.com/posts/yogeshjain96_postgresql-pgpune-pgdaypune-activity-7358704647332597760-KaHF" target="_blank">My LinkedIn post 🔗</a>
+      </details>
     - |
       #### Crafted **"PaperEvent"** Hugo theme for PG Pune Meetups 🛠️ 🐘
       `Hugo Theme` `PaperEvent` `PG Pune`

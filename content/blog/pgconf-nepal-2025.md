@@ -1,9 +1,8 @@
 ---
-title: "Speaker @ PG Conf Nepal 2025"
+title: "Spoke @ PG Conf Nepal 2025"
 date: 2025-05-16T23:07:43+05:30
 description: "Had the opportunity to speak at PGConf Nepal 2025, held at Kathmandu University, where I shared insights on Unified Observability using OpenTelemetry."
 tags: ["postgres", "conference", "nepal", "PGConfNepal", "speaker", "observability"]
-# weight: 1
 cover:
   image: images/pgconf-nepal-2025/cover.png
 ---
