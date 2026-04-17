@@ -28,6 +28,11 @@
         More details in <a href="https://www.postgresql.eu/events/pgconfeu2025/sessions/session/7035-unified-observability-monitoring-postgres-anywhere-with-opentelemetry/" target="_blank">postgresql.eu page here 🔗</a>
       </details>
     - |
+      #### @EDB 👨‍💻 🤖
+      `MCP` `Agent` `LLM` `FastMCP`
+
+      Contributed to Research & Development of MCP (Model Context Protocol) tools & server, to interact with the existing APIs, allowing user to interact with application in natural language without any hallucinations.
+    - |
       ### Spoke at HYD PGDay 2025 🎤 🐘
       `Speaker` `PGDay` `Hyderabad` `JNTUH`
 
