@@ -1,0 +1,3196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Building Real-Time, Data-Aware Intelligence with Postgres & MCP
+    </title>
+
+    <link rel="icon" href="https://curiousone.in/favicon.ico" type="image/x-icon" />
+
+    <!-- Fonts: Clash Display + JetBrains Mono for that terminal-meets-futurism look -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Outfit:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME: NEON TERMINAL)
+           Inspired by terminal aesthetics meets Postgres blue
+           =========================================== */
+      :root {
+        /* Core palette */
+        --bg-deep: #040810;
+        --bg-primary: #0a0f1c;
+        --bg-card: #0d1526;
+        --bg-card-hover: #111d33;
+        --bg-code: #060b14;
+
+        /* Accent colors — Postgres blue + complementary neon */
+        --pg-blue: #336791;
+        --pg-blue-bright: #4a90c4;
+        --accent-cyan: #00e5ff;
+        --accent-green: #39ff7f;
+        --accent-amber: #ffb020;
+        --accent-red: #ff4060;
+        --accent-violet: #a78bfa;
+        --glow-cyan: rgba(0, 229, 255, 0.25);
+        --glow-green: rgba(57, 255, 127, 0.2);
+
+        /* Typography */
+        --font-display: "Outfit", sans-serif;
+        --font-mono: "JetBrains Mono", monospace;
+        --title-size: clamp(2rem, 5.5vw, 4.2rem);
+        --h2-size: clamp(1.4rem, 3.8vw, 2.8rem);
+        --h3-size: clamp(1rem, 2.5vw, 1.5rem);
+        --body-size: clamp(0.75rem, 1.4vw, 1.05rem);
+        --small-size: clamp(0.6rem, 1vw, 0.8rem);
+        --code-size: clamp(0.55rem, 0.95vw, 0.75rem);
+
+        /* Spacing */
+        --slide-padding: clamp(1.5rem, 5vw, 5rem);
+        --content-gap: clamp(0.75rem, 2vw, 2rem);
+        --element-gap: clamp(0.3rem, 1vw, 1rem);
+
+        /* Text */
+        --text-primary: #e8ecf4;
+        --text-secondary: #7a8ba8;
+        --text-dim: #4a5a74;
+
+        /* Animation */
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --duration-normal: 0.6s;
+      }
+
+      /* ===========================================
+           RESET & BASE
+           =========================================== */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* === VIEWPORT BASE (MANDATORY) === */
+      html,
+      body {
+        height: 100%;
+        overflow-x: hidden;
+      }
+      html {
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+      }
+
+      .slide {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        scroll-snap-align: start;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      .slide-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        max-height: 100%;
+        overflow: hidden;
+        padding: var(--slide-padding);
+      }
+      img,
+      .image-container {
+        max-width: 100%;
+        max-height: min(50vh, 400px);
+        object-fit: contain;
+      }
+
+      @media (max-height: 700px) {
+        :root {
+          --slide-padding: clamp(0.75rem, 3vw, 2rem);
+          --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+          --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+          --h2-size: clamp(1rem, 3vw, 1.75rem);
+        }
+      }
+      @media (max-height: 600px) {
+        :root {
+          --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+          --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+          --title-size: clamp(1.1rem, 4vw, 2rem);
+          --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+        }
+        .nav-dots,
+        .keyboard-hint,
+        .decorative {
+          display: none;
+        }
+      }
+      @media (max-height: 500px) {
+        :root {
+          --slide-padding: clamp(0.4rem, 2vw, 1rem);
+          --title-size: clamp(1rem, 3.5vw, 1.5rem);
+          --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+          --body-size: clamp(0.65rem, 1vw, 0.85rem);
+        }
+      }
+      @media (max-width: 600px) {
+        :root {
+          --title-size: clamp(1.25rem, 7vw, 2.5rem);
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr !important;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.2s !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+      /* === END VIEWPORT BASE === */
+
+      /* ===========================================
+           BODY & BACKGROUNDS
+           =========================================== */
+      body {
+        font-family: var(--font-display);
+        background: var(--bg-deep);
+        color: var(--text-primary);
+      }
+
+      .slide {
+        background: var(--bg-primary);
+        border-bottom: 1px solid rgba(0, 229, 255, 0.06);
+      }
+
+      /* Grid overlay for depth */
+      .slide::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 229, 255, 0.018) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 229, 255, 0.018) 1px, transparent 1px);
+        background-size: clamp(30px, 5vw, 60px) clamp(30px, 5vw, 60px);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .slide > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+      h1 {
+        font-family: var(--font-display);
+        font-size: var(--title-size);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        font-family: var(--font-display);
+        font-size: var(--h2-size);
+        font-weight: 700;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        margin-bottom: var(--content-gap);
+        text-align: center;
+      }
+      h3 {
+        font-family: var(--font-display);
+        font-size: var(--h3-size);
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+      p,
+      li {
+        font-size: var(--body-size);
+        line-height: 1.65;
+        color: var(--text-secondary);
+        text-align: center;
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: var(--code-size);
+        background: var(--bg-code);
+        border: 1px solid rgba(0, 229, 255, 0.1);
+        border-radius: 4px;
+        padding: 2px 7px;
+        color: var(--accent-cyan);
+      }
+
+      /* ===========================================
+           ACCENT TEXT
+           =========================================== */
+      .cyan {
+        color: var(--accent-cyan);
+      }
+      .green {
+        color: var(--accent-green);
+      }
+      .amber {
+        color: var(--accent-amber);
+      }
+      .red {
+        color: var(--accent-red);
+      }
+      .violet {
+        color: var(--accent-violet);
+      }
+      .pg {
+        color: var(--pg-blue-bright);
+      }
+      .dim {
+        color: var(--text-dim);
+      }
+
+      .glow-text {
+        text-shadow:
+          0 0 20px var(--glow-cyan),
+          0 0 40px rgba(0, 229, 255, 0.15);
+      }
+
+      /* ===========================================
+           REVEAL ANIMATIONS
+           =========================================== */
+      .reveal {
+        opacity: 0;
+        transform: translateY(25px);
+        transition:
+          opacity var(--duration-normal) var(--ease-out-expo),
+          transform var(--duration-normal) var(--ease-out-expo);
+      }
+      .slide.visible .reveal {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .slide.visible .reveal:nth-child(1) {
+        transition-delay: 0.05s;
+      }
+      .slide.visible .reveal:nth-child(2) {
+        transition-delay: 0.15s;
+      }
+      .slide.visible .reveal:nth-child(3) {
+        transition-delay: 0.25s;
+      }
+      .slide.visible .reveal:nth-child(4) {
+        transition-delay: 0.35s;
+      }
+      .slide.visible .reveal:nth-child(5) {
+        transition-delay: 0.45s;
+      }
+      .slide.visible .reveal:nth-child(6) {
+        transition-delay: 0.55s;
+      }
+
+      .reveal-scale {
+        opacity: 0;
+        transform: scale(0.92);
+        transition:
+          opacity 0.7s var(--ease-out-expo),
+          transform 0.7s var(--ease-out-expo);
+      }
+      .slide.visible .reveal-scale {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      /* ===========================================
+           CODE BLOCKS
+           =========================================== */
+      .code-block {
+        font-family: var(--font-mono);
+        font-size: var(--code-size);
+        line-height: 1.65;
+        background: var(--bg-code);
+        border: 1px solid rgba(0, 229, 255, 0.08);
+        border-radius: clamp(6px, 1vw, 10px);
+        padding: clamp(10px, 2vw, 20px);
+        overflow-x: auto;
+        white-space: pre;
+        color: var(--text-secondary);
+        max-height: min(55vh, 420px);
+      }
+      .code-block .kw {
+        color: var(--accent-cyan);
+      }
+      .code-block .fn {
+        color: var(--accent-green);
+      }
+      .code-block .str {
+        color: var(--accent-amber);
+      }
+      .code-block .cm {
+        color: var(--text-dim);
+        font-style: italic;
+      }
+      .code-block .err {
+        color: var(--accent-red);
+      }
+      .code-block .num {
+        color: var(--accent-violet);
+      }
+
+      /* ===========================================
+           CARDS & PANELS
+           =========================================== */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 229, 255, 0.08);
+        border-radius: clamp(8px, 1.2vw, 14px);
+        padding: clamp(12px, 2vw, 24px);
+        transition: all 0.3s ease;
+      }
+      .card:hover {
+        border-color: rgba(0, 229, 255, 0.2);
+        background: var(--bg-card-hover);
+      }
+      .card h4 {
+        font-size: var(--body-size);
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: clamp(4px, 0.5vw, 8px);
+      }
+      .card p,
+      .card li {
+        font-size: var(--small-size);
+        text-align: left;
+      }
+      .vs-panel p {
+        text-align: left;
+      }
+
+      /* ===========================================
+           GRIDS
+           =========================================== */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(8px, 1.5vw, 16px);
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: clamp(8px, 1.5vw, 16px);
+      }
+
+      /* ===========================================
+           TABLE STYLES
+           =========================================== */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--small-size);
+      }
+      th {
+        background: rgba(0, 229, 255, 0.06);
+        color: var(--accent-cyan);
+        font-family: var(--font-mono);
+        font-weight: 500;
+        padding: clamp(6px, 1vw, 12px) clamp(8px, 1.2vw, 16px);
+        text-align: left;
+        border-bottom: 1px solid rgba(0, 229, 255, 0.15);
+      }
+      td {
+        padding: clamp(6px, 1vw, 10px) clamp(8px, 1.2vw, 16px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--text-secondary);
+        text-align: left;
+      }
+      tr:hover td {
+        background: rgba(0, 229, 255, 0.03);
+      }
+
+      /* ===========================================
+           BADGES & TAGS
+           =========================================== */
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: clamp(0.5rem, 0.8vw, 0.7rem);
+        padding: 3px 10px;
+        border-radius: 20px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .badge-cyan {
+        background: rgba(0, 229, 255, 0.12);
+        color: var(--accent-cyan);
+        border: 1px solid rgba(0, 229, 255, 0.2);
+      }
+      .badge-green {
+        background: rgba(57, 255, 127, 0.1);
+        color: var(--accent-green);
+        border: 1px solid rgba(57, 255, 127, 0.2);
+      }
+      .badge-amber {
+        background: rgba(255, 176, 32, 0.1);
+        color: var(--accent-amber);
+        border: 1px solid rgba(255, 176, 32, 0.2);
+      }
+      .badge-red {
+        background: rgba(255, 64, 96, 0.1);
+        color: var(--accent-red);
+        border: 1px solid rgba(255, 64, 96, 0.2);
+      }
+
+      /* ===========================================
+           FLOW / ARCHITECTURE DIAGRAMS
+           =========================================== */
+      .flow-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(6px, 1vw, 14px);
+        flex-wrap: wrap;
+      }
+      .flow-box {
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 229, 255, 0.12);
+        border-radius: clamp(8px, 1vw, 12px);
+        padding: clamp(10px, 1.5vw, 20px) clamp(14px, 2vw, 28px);
+        text-align: center;
+        font-size: var(--small-size);
+        min-width: clamp(80px, 12vw, 140px);
+      }
+      .flow-arrow {
+        color: var(--text-dim);
+        font-size: clamp(14px, 2vw, 22px);
+      }
+
+      /* ===========================================
+           SLIDE-SPECIFIC: TITLE
+           =========================================== */
+      .title-slide {
+        background:
+          radial-gradient(
+            ellipse at 15% 85%,
+            rgba(51, 103, 145, 0.25) 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 85% 15%,
+            rgba(0, 229, 255, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            ellipse at 50% 50%,
+            rgba(57, 255, 127, 0.04) 0%,
+            transparent 60%
+          ),
+          var(--bg-primary);
+      }
+      .title-slide .slide-content {
+        justify-content: center;
+        align-items: flex-start;
+        gap: clamp(8px, 1.5vw, 16px);
+      }
+      .title-slide h1,
+      .title-slide h3,
+      .title-slide .section-label,
+      .title-slide .sep {
+        text-align: left;
+        margin-left: 0;
+        margin-right: auto;
+      }
+      .title-meta {
+        display: flex;
+        align-items: center;
+        gap: clamp(8px, 1.5vw, 16px);
+        margin-top: clamp(16px, 3vh, 40px);
+      }
+
+      /* ===========================================
+           SLIDE NUMBER (top-right corner)
+           =========================================== */
+      .slide-num {
+        position: absolute;
+        top: clamp(12px, 2vw, 24px);
+        right: clamp(16px, 3vw, 40px);
+        font-family: var(--font-mono);
+        font-size: var(--small-size);
+        color: var(--text-dim);
+        z-index: 2;
+      }
+
+      /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+      .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--pg-blue-bright),
+          var(--accent-cyan),
+          var(--accent-green)
+        );
+        z-index: 1000;
+        transition: width 0.3s ease;
+        width: 0%;
+        box-shadow: 0 0 8px var(--glow-cyan);
+      }
+
+      /* ===========================================
+           NAV DOTS
+           =========================================== */
+      .nav-dots {
+        position: fixed;
+        left: 0;
+        top: 50%;
+        transform: translateX(-100%) translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+        padding: 12px 10px 12px 14px;
+        transition: transform 0.3s var(--ease-out-expo);
+      }
+      .nav-dots:hover,
+      .nav-dots.visible {
+        transform: translateX(0) translateY(-50%);
+      }
+      .nav-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--text-dim);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        padding: 0;
+        position: relative;
+      }
+      .nav-dot.active {
+        background: var(--accent-cyan);
+        box-shadow: 0 0 8px var(--glow-cyan);
+        transform: scale(1.3);
+      }
+      .nav-dot:hover {
+        background: var(--accent-cyan);
+        transform: scale(1.8);
+        box-shadow: 0 0 6px var(--glow-cyan);
+      }
+      .nav-dot .nav-tooltip {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--bg-card);
+        border: 1px solid rgba(0, 229, 255, 0.15);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-family: var(--font-mono);
+        font-size: clamp(0.5rem, 0.8vw, 0.65rem);
+        color: var(--text-primary);
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      .nav-dot:hover .nav-tooltip {
+        opacity: 1;
+      }
+
+      /* ===========================================
+           BULLET LIST STYLING
+           =========================================== */
+      .bullets {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(4px, 0.8vh, 10px);
+      }
+      .bullets li {
+        padding-left: clamp(16px, 2vw, 24px);
+        position: relative;
+        text-align: left;
+      }
+      .bullets li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: clamp(6px, 0.8vw, 10px);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent-cyan);
+        box-shadow: 0 0 6px var(--glow-cyan);
+      }
+
+      /* ===========================================
+           SEPARATOR LINE
+           =========================================== */
+      .sep {
+        width: clamp(40px, 6vw, 80px);
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent-cyan), transparent);
+        margin: clamp(8px, 1.5vh, 16px) auto;
+      }
+
+      /* ===========================================
+           SECTION LABEL (small label above heading)
+           =========================================== */
+      .section-label {
+        font-family: var(--font-mono);
+        font-size: var(--small-size);
+        color: var(--accent-cyan);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: clamp(4px, 0.8vh, 10px);
+        text-align: center;
+      }
+
+      /* ===========================================
+           SPECIAL: VERSUS LAYOUT
+           =========================================== */
+      .vs-panel {
+        border-radius: clamp(8px, 1vw, 12px);
+        padding: clamp(10px, 1.5vw, 20px);
+        flex: 1;
+      }
+      .vs-bad {
+        background: rgba(255, 64, 96, 0.06);
+        border: 1px solid rgba(255, 64, 96, 0.15);
+      }
+      .vs-good {
+        background: rgba(57, 255, 127, 0.05);
+        border: 1px solid rgba(57, 255, 127, 0.15);
+      }
+
+      /* ===========================================
+           SUMMARY CHECKMARKS
+           =========================================== */
+      .check-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(3px, 0.6vh, 8px);
+      }
+      .check-list li {
+        font-size: var(--body-size);
+        color: var(--text-secondary);
+        text-align: left;
+      }
+      .check-list li::before {
+        content: none;
+      }
+      .check {
+        color: var(--accent-green);
+        margin-right: 8px;
+        font-weight: 700;
+      }
+
+      /* ===========================================
+           LOGO (top-left, all slides)
+           =========================================== */
+      .slide-logo {
+        position: absolute;
+        top: clamp(16px, 2.5vw, 32px);
+        left: clamp(20px, 3vw, 44px);
+        height: clamp(32px, 5vh, 60px);
+        filter: brightness(1.1);
+        z-index: 2;
+      }
+
+      /* ===========================================
+           FOOTER (bottom-right, all slides)
+           =========================================== */
+      .slide-footer {
+        position: absolute;
+        bottom: clamp(10px, 1.5vw, 20px);
+        right: clamp(16px, 3vw, 40px);
+        font-family: var(--font-mono);
+        font-size: clamp(0.45rem, 0.7vw, 0.6rem);
+        color: var(--text-dim);
+        letter-spacing: 0.05em;
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation Dots -->
+    <nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+
+    <!-- ===========================================
+     SLIDE 01: TITLE
+     =========================================== -->
+    <section class="slide title-slide">
+      <img src="https://curiousone.in/slides/images/edb-logo.svg" alt="EDB" class="slide-logo" />
+      <div class="slide-content">
+        <div class="section-label reveal">
+          PostgreSQL Conference &middot; San Jose
+        </div>
+        <h1 class="reveal" style="font-size: clamp(1.6rem, 4.2vw, 3.2rem)">
+          Building Real-Time,
+          <span class="cyan glow-text">Data-Aware</span> Intelligence with<br /><span
+            class="pg"
+            >Postgres</span
+          >
+          & <span class="violet">Model Context Protocol</span>
+        </h1>
+        <div class="sep reveal"></div>
+        <h3
+          class="reveal"
+          style="
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 650px;
+          "
+        >
+          Eliminating Hallucinations with Postgres and the Model Context
+          Protocol
+        </h3>
+        <div class="title-meta reveal">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <span
+              style="
+                font-size: var(--body-size);
+                color: var(--text-primary);
+                font-weight: 600;
+              "
+              >Yogesh Jain</span
+            >
+            <span style="font-size: var(--small-size); color: var(--text-dim)"
+              >Staff SDE</span
+            >
+          </div>
+          <span style="color: var(--text-dim)">&middot;</span>
+          <span class="badge badge-cyan">LLM</span>
+          <span class="badge badge-green">MCP</span>
+          <span class="badge badge-amber">Postgres</span>
+        </div>
+      </div>
+      <div class="slide-footer">&copy; EDB 2026 - ALL RIGHTS RESERVED.</div>
+      <div class="slide-num">01 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 02: ABOUT THE AUTHOR
+     =========================================== -->
+    <section class="slide">
+      <div
+        class="slide-content"
+        style="
+          flex-direction: row;
+          align-items: center;
+          gap: clamp(24px, 5vw, 60px);
+        "
+      >
+        <div style="flex: 1; max-width: 600px" class="reveal">
+          <div class="section-label" style="text-align: left">About Me</div>
+          <h2 style="margin-bottom: clamp(4px, 1vh, 10px); text-align: left">
+            Yogesh Jain
+          </h2>
+          <p
+            style="
+              color: var(--accent-cyan);
+              font-family: var(--font-mono);
+              font-size: var(--small-size);
+              margin-bottom: clamp(10px, 2vh, 20px);
+              text-align: left;
+            "
+          >
+            Staff SDE @ EDB &middot; Curious One &middot; Full Stack Developer
+          </p>
+          <div class="sep" style="margin-left: 0"></div>
+          <ul class="bullets" style="margin-top: clamp(8px, 1.5vh, 16px)">
+            <li>
+              Building a
+              <strong class="amber">Postgres Hybrid Manager</strong> for
+              managing Postgres across different deployment platforms
+            </li>
+            <li>
+              Focused on <strong class="cyan">Unified Observability</strong> and
+              <strong class="green">AI Ecosystem integration</strong> at EDB
+            </li>
+            <li>
+              Enabling a <strong class="violet">Single Pane of Glass</strong>:
+              metrics, logs & AI-driven insights across all platforms
+            </li>
+          </ul>
+        </div>
+        <div
+          style="
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(6px, 1vh, 12px);
+          "
+          class="reveal-scale"
+        >
+          <div
+            class="card"
+            style="
+              text-align: center;
+              border-top: 2px solid var(--accent-cyan);
+              min-width: clamp(140px, 18vw, 200px);
+            "
+          >
+            <div style="font-size: clamp(20px, 3vw, 36px); margin-bottom: 4px">
+              &#128024;
+            </div>
+            <h4 class="cyan" style="font-size: var(--small-size)">Postgres</h4>
+            <p style="font-size: clamp(0.6rem, 1vw, 0.85rem)">
+              Monitoring &amp; Observability
+            </p>
+          </div>
+          <div
+            class="card"
+            style="
+              text-align: center;
+              border-top: 2px solid var(--accent-violet);
+              min-width: clamp(140px, 18vw, 200px);
+            "
+          >
+            <div style="font-size: clamp(20px, 3vw, 36px); margin-bottom: 4px">
+              &#9729;&#65039;
+            </div>
+            <h4 class="violet" style="font-size: var(--small-size)">
+              Kubernetes
+            </h4>
+            <p style="font-size: clamp(0.6rem, 1vw, 0.85rem)">
+              Cloud-Native Infrastructure
+            </p>
+          </div>
+          <div
+            class="card"
+            style="
+              text-align: center;
+              border-top: 2px solid var(--accent-green);
+              min-width: clamp(140px, 18vw, 200px);
+            "
+          >
+            <div style="font-size: clamp(20px, 3vw, 36px); margin-bottom: 4px">
+              &#129302;
+            </div>
+            <h4 class="green" style="font-size: var(--small-size)">
+              AI Integration
+            </h4>
+            <p style="font-size: clamp(0.6rem, 1vw, 0.85rem)">
+              LLMs &amp; MCP for Databases
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num"></div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 03: THE BACKSTORY
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">The Origin Story</div>
+        <h2 class="reveal">
+          Where It All <span class="amber">Started</span>
+        </h2>
+        <p
+          class="reveal"
+          style="max-width: 650px; margin-bottom: var(--content-gap)"
+        >
+          I wanted to query APIs and get
+          <strong class="cyan">real-time data</strong> in a chatbot using
+          natural language. Before MCP or agents existed, I built my own
+          solution.
+        </p>
+        <div class="grid-2 reveal-scale" style="max-width: 950px">
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: clamp(6px, 1vh, 10px);
+            "
+          >
+            <div class="card" style="border-left: 3px solid var(--accent-cyan)">
+              <h4><span class="cyan">1.</span> Pass API spec to LLM</h4>
+              <p>
+                Fed the OpenAPI/Swagger spec as context and asked the LLM to
+                generate a <code>curl</code> command.
+              </p>
+            </div>
+            <div
+              class="card"
+              style="border-left: 3px solid var(--accent-green)"
+            >
+              <h4><span class="green">2.</span> Execute the curl</h4>
+              <p>
+                Wrote a function to parse and execute the generated
+                <code>curl</code>, then fed the response back to the LLM.
+              </p>
+            </div>
+            <div
+              class="card"
+              style="border-left: 3px solid var(--accent-green)"
+            >
+              <h4><span class="green">3.</span> It worked!</h4>
+              <p>
+                Natural language &rarr; API call &rarr; human-readable answer.
+                The loop closed.
+              </p>
+            </div>
+          </div>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: clamp(6px, 1vh, 10px);
+            "
+          >
+            <div class="code-block" style="font-size: var(--code-size)">
+              <span class="cm">// My DIY "agent" - early 2024</span>
+              
+              <span class="fn">User</span>:
+              <span class="str"
+                >"What's the current CPU usage and total DB connections?"</span
+              >
+              <span class="dim">&darr;</span>
+              <span class="fn">LLM</span> + <span class="kw">API Spec</span> &rarr;
+              <span class="kw">curl</span> -X GET https://monitor.curiousone.in/
+              /api/v1/metrics?names=cpu,db_conn
+              <span>-H Authorization: Bearer ..."</span>
+              <span class="dim">&darr;</span>
+              <span class="fn">execute()</span> &rarr; { cpu: 72%, conn: 84 }
+              <span class="dim">&darr;</span>
+              <span class="fn">LLM</span>:
+              <span class="str"
+                >"CPU is at 72% and there are 84 active DB connections."</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num"></div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 04: THE PROBLEM WITH DIY
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">The Scaling Wall</div>
+        <h2 class="reveal">But It <span class="red">Didn't Scale</span></h2>
+        <p
+          class="reveal"
+          style="max-width: 650px; margin-bottom: var(--content-gap)"
+        >
+          Every new data source needed custom glue code. I wasn't the only one
+          facing this.
+        </p>
+        <div class="grid-2 reveal-scale" style="max-width: 950px">
+          <div class="vs-panel vs-bad">
+            <h4
+              class="red"
+              style="font-size: var(--body-size); margin-bottom: 10px"
+            >
+              Custom Tooling (2024)
+            </h4>
+            <ul class="bullets">
+              <li>New parser for every API format</li>
+              <li>Custom auth handling per source</li>
+              <li>Fragile prompt engineering for each spec</li>
+              <li>No shared standard across teams</li>
+              <li>Every engineer reinventing the wheel</li>
+            </ul>
+          </div>
+          <div class="vs-panel vs-good">
+            <h4
+              class="green"
+              style="font-size: var(--body-size); margin-bottom: 10px"
+            >
+              MCP (Today)
+            </h4>
+            <ul class="bullets">
+              <li>
+                <strong class="green">One protocol</strong> for all data sources
+              </li>
+              <li>Standardized tool discovery & invocation</li>
+              <li>Auth, safety & validation built in</li>
+              <li>Growing ecosystem of MCP servers</li>
+              <li>Adopted across the AI industry</li>
+            </ul>
+          </div>
+        </div>
+        <p
+          class="reveal dim"
+          style="margin-top: var(--content-gap); font-size: var(--small-size)"
+        >
+          Anthropic introduced MCP as an open standard - and it solved exactly
+          this problem for everyone.
+        </p>
+      </div>
+      <div class="slide-num"></div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 05: AGENDA
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Agenda</div>
+        <h2 class="reveal">What We'll <span class="cyan">Cover</span></h2>
+        <div class="sep reveal"></div>
+        <div
+          class="grid-2 reveal-scale"
+          style="max-width: 950px; margin-top: clamp(8px, 1.5vh, 16px)"
+        >
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: clamp(6px, 1vh, 12px);
+            "
+          >
+            <div
+              class="card"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border-left: 3px solid var(--accent-red);
+              "
+            >
+              <span class="badge badge-red">01</span>
+              <p style="margin: 0; font-size: var(--body-size)">
+                <strong class="red">The Problem</strong>: Why LLMs hallucinate
+                SQL
+              </p>
+            </div>
+            <div
+              class="card"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border-left: 3px solid var(--accent-violet);
+              "
+            >
+              <span class="badge badge-cyan">02</span>
+              <p style="margin: 0; font-size: var(--body-size)">
+                <strong class="violet">MCP</strong>: What it is &amp; how it
+                works
+              </p>
+            </div>
+            <div
+              class="card"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border-left: 3px solid var(--accent-cyan);
+              "
+            >
+              <span class="badge badge-cyan">03</span>
+              <p style="margin: 0; font-size: var(--body-size)">
+                <strong class="cyan">Postgres + MCP</strong>: pg_catalog, tools
+                &amp; flow
+              </p>
+            </div>
+          </div>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: clamp(6px, 1vh, 12px);
+            "
+          >
+            <div
+              class="card"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border-left: 3px solid var(--accent-amber);
+              "
+            >
+              <span class="badge badge-amber">04</span>
+              <p style="margin: 0; font-size: var(--body-size)">
+                <strong class="amber">EXPLAIN</strong>: Optimizing the queries
+              </p>
+            </div>
+            <div
+              class="card"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border-left: 3px solid var(--accent-green);
+              "
+            >
+              <span class="badge badge-green">05</span>
+              <p style="margin: 0; font-size: var(--body-size)">
+                <strong class="green">Security</strong>: Read-only roles, RLS
+                &amp; audit
+              </p>
+            </div>
+            <div
+              class="card"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                border-left: 3px solid var(--accent-amber);
+              "
+            >
+              <span class="badge badge-amber">06</span>
+              <p style="margin: 0; font-size: var(--body-size)">
+                <strong class="amber">Hybrid</strong>: Custom MCP + Postgres MCP
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num"></div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 06: THE PROBLEM
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">The Problem</div>
+        <h2 class="reveal">
+          LLMs Are <span class="red">Blind</span> to Your Data
+        </h2>
+        <p
+          class="reveal"
+          style="max-width: 650px; margin-bottom: var(--content-gap)"
+        >
+          LLMs understand SQL syntax perfectly. But they don't know
+          <em>your</em> table names, column names, or relationships. They guess
+          based on training data patterns.
+        </p>
+        <div class="grid-2 reveal-scale">
+          <div class="vs-panel vs-bad">
+            <h4
+              class="red"
+              style="font-size: var(--body-size); margin-bottom: 8px"
+            >
+              What the LLM generates
+            </h4>
+            <div class="code-block"><span class="kw">SELECT</span> u.name, o.total
+<span class="kw">FROM</span>   <span class="err">users</span> u
+<span class="kw">JOIN</span>   <span class="err">orders</span> o
+       <span class="kw">ON</span> u.id = <span class="err">o.user_id</span></div>
+            <p style="margin-top: 8px; font-size: var(--small-size)">
+              <span class="red">ERROR:</span> relation "users" does not exist
+            </p>
+          </div>
+          <div class="vs-panel vs-good">
+            <h4
+              class="green"
+              style="font-size: var(--body-size); margin-bottom: 8px"
+            >
+              What actually exists
+            </h4>
+            <div class="code-block"><span class="kw">SELECT</span> c.full_name, o.total_price
+<span class="kw">FROM</span>   <span class="fn">app_customers</span> c
+<span class="kw">JOIN</span>   <span class="fn">customer_orders</span> o
+       <span class="kw">ON</span> c.id = o.customer_id</div>
+            <p style="margin-top: 8px; font-size: var(--small-size)">
+              <span class="green">SUCCESS:</span> 47 rows returned
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">02 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 07: THE CONTEXT GAP
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Root Cause</div>
+        <h2 class="reveal">The <span class="amber">Context Gap</span></h2>
+        <p
+          class="reveal"
+          style="max-width: 600px; margin-bottom: var(--content-gap)"
+        >
+          Every type of SQL hallucination traces back to missing context:
+        </p>
+        <table class="reveal-scale" style="max-width: 950px">
+          <thead>
+            <tr>
+              <th>Hallucination</th>
+              <th>Example</th>
+              <th>Missing Context</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="red">Wrong table</span></td>
+              <td><code>FROM users</code></td>
+              <td>Real table: <code>app_customers</code></td>
+            </tr>
+            <tr>
+              <td><span class="red">Wrong column</span></td>
+              <td><code>SELECT email FROM orders</code></td>
+              <td>Column doesn't exist</td>
+            </tr>
+            <tr>
+              <td><span class="red">Wrong JOIN</span></td>
+              <td><code>ON users.id = orders.id</code></td>
+              <td>Should be <code>orders.user_id</code></td>
+            </tr>
+            <tr>
+              <td><span class="red">Wrong types</span></td>
+              <td><code>WHERE created_at = '2024'</code></td>
+              <td>It's a <code>timestamptz</code></td>
+            </tr>
+            <tr>
+              <td><span class="red">Wrong dialect</span></td>
+              <td><code>DATEADD(day, 7, now())</code></td>
+              <td>That's SQL Server, not PG</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="slide-num">03 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 08: WHAT IS MCP
+     =========================================== -->
+    <section
+      class="slide"
+      style="
+        background:
+          radial-gradient(
+            ellipse at 30% 70%,
+            rgba(167, 139, 250, 0.1) 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 70% 30%,
+            rgba(0, 229, 255, 0.05) 0%,
+            transparent 45%
+          ),
+          var(--bg-primary);
+      "
+    >
+      <div class="slide-content">
+        <div class="section-label reveal">The Solution</div>
+        <h2 class="reveal">
+          The <span class="violet">Model Context Protocol</span>
+        </h2>
+        <p
+          class="reveal"
+          style="max-width: 600px; margin-bottom: var(--content-gap)"
+        >
+          MCP is an open standard that connects AI models to external data
+          sources and tools. Think of it as
+          <strong class="cyan">USB-C for AI</strong>.
+        </p>
+
+        <!-- Visual Architecture Diagram -->
+        <div class="reveal-scale" style="width: 100%; max-width: 950px; margin: 0 auto;">
+          <style>
+            .mcp-hub {
+              display: grid;
+              grid-template-columns: auto auto auto auto auto;
+              align-items: center;
+              justify-content: center;
+              gap: clamp(6px, 1.5vw, 20px);
+            }
+            .mcp-node {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 5px;
+            }
+            .mcp-node-icon {
+              width: clamp(50px, 6vw, 76px);
+              height: clamp(50px, 6vw, 76px);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: clamp(20px, 2.8vw, 32px);
+              position: relative;
+              z-index: 2;
+            }
+            .mcp-node-icon.sm {
+              width: clamp(34px, 4.5vw, 54px);
+              height: clamp(34px, 4.5vw, 54px);
+              font-size: clamp(14px, 2vw, 22px);
+            }
+            .mcp-node-icon.violet-node {
+              background: radial-gradient(circle, rgba(167, 139, 250, 0.2), rgba(167, 139, 250, 0.05));
+              border: 2px solid rgba(167, 139, 250, 0.5);
+              box-shadow: 0 0 20px rgba(167, 139, 250, 0.2), inset 0 0 15px rgba(167, 139, 250, 0.1);
+            }
+            .mcp-node-icon.green-node {
+              background: radial-gradient(circle, rgba(57, 255, 127, 0.15), rgba(57, 255, 127, 0.03));
+              border: 2px solid rgba(57, 255, 127, 0.5);
+              box-shadow: 0 0 20px rgba(57, 255, 127, 0.2), inset 0 0 15px rgba(57, 255, 127, 0.1);
+            }
+            .mcp-node-icon.amber-node {
+              background: radial-gradient(circle, rgba(255, 176, 32, 0.15), rgba(255, 176, 32, 0.03));
+              border: 2px solid rgba(255, 176, 32, 0.5);
+              box-shadow: 0 0 20px rgba(255, 176, 32, 0.2), inset 0 0 15px rgba(255, 176, 32, 0.1);
+            }
+            .mcp-node-icon.cyan-node {
+              background: radial-gradient(circle, rgba(0, 229, 255, 0.15), rgba(0, 229, 255, 0.03));
+              border: 2px solid rgba(0, 229, 255, 0.5);
+              box-shadow: 0 0 20px rgba(0, 229, 255, 0.2), inset 0 0 15px rgba(0, 229, 255, 0.1);
+            }
+            .mcp-node-icon.red-node {
+              background: radial-gradient(circle, rgba(255, 64, 96, 0.15), rgba(255, 64, 96, 0.03));
+              border: 2px solid rgba(255, 64, 96, 0.4);
+              box-shadow: 0 0 20px rgba(255, 64, 96, 0.15), inset 0 0 15px rgba(255, 64, 96, 0.1);
+            }
+            .mcp-node-label {
+              font-size: clamp(0.5rem, 0.85vw, 0.75rem);
+              font-weight: 600;
+              text-align: center;
+            }
+            .mcp-node-sub {
+              font-size: clamp(0.45rem, 0.7vw, 0.6rem);
+              color: var(--text-dim);
+              text-align: center;
+            }
+            .mcp-servers-col {
+              display: flex;
+              flex-direction: column;
+              gap: clamp(10px, 1.8vw, 24px);
+            }
+            .mcp-server-row {
+              display: flex;
+              align-items: center;
+              gap: clamp(6px, 1vw, 14px);
+            }
+            .mcp-wire-h {
+              width: clamp(40px, 6vw, 90px);
+              height: 2px;
+              position: relative;
+              overflow: hidden;
+              border-radius: 1px;
+            }
+            .mcp-wire-h::before {
+              content: '';
+              position: absolute;
+              top: 0; left: 0; width: 100%; height: 100%;
+              background: linear-gradient(90deg, transparent, var(--wire-color), transparent);
+              opacity: 0.35;
+            }
+            .mcp-wire-h::after {
+              content: '';
+              position: absolute;
+              top: -1px; left: -30%; width: 30%; height: 4px;
+              background: linear-gradient(90deg, transparent, var(--wire-color), transparent);
+              border-radius: 2px;
+              box-shadow: 0 0 8px var(--wire-color);
+              animation: mcp-pulse-r 2.2s ease-in-out infinite;
+            }
+            .mcp-wire-h.rev::after {
+              animation: mcp-pulse-l 2.2s ease-in-out infinite;
+            }
+            .mcp-wire-h.w1::after { animation-delay: 0s; }
+            .mcp-wire-h.w2::after { animation-delay: 0.7s; }
+            .mcp-wire-h.w3::after { animation-delay: 1.4s; }
+            @keyframes mcp-pulse-r {
+              0% { left: -30%; opacity: 0; }
+              10% { opacity: 1; }
+              90% { opacity: 1; }
+              100% { left: 100%; opacity: 0; }
+            }
+            @keyframes mcp-pulse-l {
+              0% { left: 100%; opacity: 0; }
+              10% { opacity: 1; }
+              90% { opacity: 1; }
+              100% { left: -30%; opacity: 0; }
+            }
+            .mcp-fan-lines {
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              position: relative;
+              width: clamp(40px, 6vw, 80px);
+              height: 100%;
+            }
+            .mcp-fan-lines svg {
+              width: 100%;
+              height: clamp(100px, 14vw, 180px);
+              overflow: visible;
+            }
+            .mcp-fan-line {
+              stroke-dasharray: 4 4;
+              animation: mcp-dash 1.5s linear infinite;
+            }
+            @keyframes mcp-dash {
+              to { stroke-dashoffset: -16; }
+            }
+          </style>
+
+          <div class="mcp-hub">
+            <!-- Left: MCP Client -->
+            <div class="mcp-node">
+              <div class="mcp-node-icon violet-node">&#128187;</div>
+              <div class="mcp-node-label violet">MCP Client</div>
+              <div class="mcp-node-sub">Claude, VS Code, IDEs</div>
+            </div>
+
+            <!-- Fan-out lines from Client to Servers -->
+            <div class="mcp-fan-lines">
+              <svg viewBox="0 0 60 140" preserveAspectRatio="none">
+                <line x1="0" y1="70" x2="60" y2="14" class="mcp-fan-line" stroke="rgba(167, 139, 250, 0.5)" stroke-width="1.5"/>
+                <line x1="0" y1="70" x2="60" y2="70" class="mcp-fan-line" stroke="rgba(167, 139, 250, 0.5)" stroke-width="1.5"/>
+                <line x1="0" y1="70" x2="60" y2="126" class="mcp-fan-line" stroke="rgba(167, 139, 250, 0.5)" stroke-width="1.5"/>
+              </svg>
+            </div>
+
+            <!-- Middle: MCP Servers stacked -->
+            <div class="mcp-servers-col">
+              <div class="mcp-node">
+                <div class="mcp-node-icon sm green-node">&#9881;&#65039;</div>
+                <div class="mcp-node-label" style="color: var(--accent-green);">Postgres MCP</div>
+              </div>
+              <div class="mcp-node">
+                <div class="mcp-node-icon sm green-node">&#9881;&#65039;</div>
+                <div class="mcp-node-label" style="color: var(--accent-green);">Filesystem MCP</div>
+              </div>
+              <div class="mcp-node">
+                <div class="mcp-node-icon sm green-node">&#9881;&#65039;</div>
+                <div class="mcp-node-label" style="color: var(--accent-green);">Prometheus MCP</div>
+              </div>
+            </div>
+
+            <!-- Wires from Servers to Data Sources -->
+            <div class="mcp-servers-col">
+              <div class="mcp-wire-h w1" style="--wire-color: rgba(255, 176, 32, 0.8);"></div>
+              <div class="mcp-wire-h w2" style="--wire-color: rgba(0, 229, 255, 0.8);"></div>
+              <div class="mcp-wire-h w3" style="--wire-color: rgba(255, 64, 96, 0.7);"></div>
+            </div>
+
+            <!-- Right: Data Sources stacked -->
+            <div class="mcp-servers-col">
+              <div class="mcp-node">
+                <div class="mcp-node-icon sm amber-node">&#128024;</div>
+                <div class="mcp-node-label" style="color: var(--accent-amber);">PostgreSQL</div>
+              </div>
+              <div class="mcp-node">
+                <div class="mcp-node-icon sm cyan-node">&#128196;</div>
+                <div class="mcp-node-label" style="color: var(--accent-cyan);">PG Logs</div>
+              </div>
+              <div class="mcp-node">
+                <div class="mcp-node-icon sm red-node">&#128200;</div>
+                <div class="mcp-node-label" style="color: var(--accent-red);">Telemetry</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Protocol Badge -->
+          <div style="text-align: center; margin-top: clamp(12px, 2vw, 24px);">
+            <span style="
+              font-family: var(--font-mono);
+              font-size: clamp(0.5rem, 0.8vw, 0.65rem);
+              color: var(--text-dim);
+              background: rgba(0, 229, 255, 0.05);
+              border: 1px solid rgba(0, 229, 255, 0.1);
+              padding: 4px 12px;
+              border-radius: 20px;
+            ">JSON-RPC 2.0 &bull; stdio / SSE transport &bull; One client &rarr; many servers</span>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">04 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 09: MCP PRIMITIVES
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">MCP Primitives</div>
+        <h2 class="reveal">MCP Building Blocks</h2>
+        <p class="reveal" style="max-width: 600px; margin-bottom: var(--content-gap)">MCP defines three primitives. For databases, <strong class="cyan">Tools</strong> matter most - they return <em>live</em> data, not stale snapshots.</p>
+        <div class="grid-3 reveal-scale" style="max-width: 950px">
+          <div class="card" style="border-top: 2px solid var(--accent-cyan)">
+            <h4><span class="cyan">&#128295; Tools</span></h4>
+            <p>Functions the LLM can call. Returns live, real-time results.</p>
+            <div style="margin-top: 8px">
+              <span class="badge badge-cyan">execute_sql</span>
+              <span class="badge badge-cyan">list_schemas</span>
+            </div>
+          </div>
+          <div class="card" style="border-top: 2px solid var(--text-dim)">
+            <h4><span class="dim">&#128196; Resources</span></h4>
+            <p>Read-only, static data via URIs. Schema snapshots go stale fast.</p>
+          </div>
+          <div class="card" style="border-top: 2px solid var(--text-dim)">
+            <h4><span class="dim">&#128172; Prompts</span></h4>
+            <p>Reusable templates that bundle context and instructions.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">05 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 10: PG MCP TOOLS
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">pg-airman-mcp</div>
+        <h2 class="reveal">
+          Tools for <span class="green">Data-Aware</span> AI
+        </h2>
+        <div class="grid-2 reveal-scale" style="max-width: 950px">
+          <div class="card">
+            <h4><span class="cyan">list_schemas</span></h4>
+            <p>
+              Returns all database schemas, categorized as system or user. The
+              starting point for discovery.
+            </p>
+          </div>
+          <div class="card">
+            <h4><span class="cyan">list_objects</span></h4>
+            <p>
+              Retrieves tables, views, sequences & functions within a schema,
+              including comments.
+            </p>
+          </div>
+          <div class="card">
+            <h4><span class="cyan">get_object_details</span></h4>
+            <p>
+              Comprehensive details: columns, types, constraints, indexes &
+              comments for any object.
+            </p>
+          </div>
+          <div class="card">
+            <h4><span class="amber">explain_query</span></h4>
+            <p>
+              Runs EXPLAIN plans and simulates hypothetical indexes via
+              <strong>HypoPG</strong> without creating them.
+            </p>
+          </div>
+          <div class="card">
+            <h4><span class="green">execute_sql</span></h4>
+            <p>
+              Executes queries with configurable access control, read-only mode
+              & safe SQL parsing.
+            </p>
+          </div>
+          <div class="card">
+            <h4><span class="violet">analyze_query_indexes</span></h4>
+            <p>
+              Explores thousands of possible indexes to find optimal solutions
+              for your workload.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">06 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 11: THE QUERY FLOW
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">The Query Flow</div>
+        <h2 class="reveal">
+          From Question to <span class="green">Correct</span> SQL
+        </h2>
+        <p class="reveal dim" style="margin-bottom: var(--content-gap)">
+          User asks: <span class="amber">"Show me top 5 customers by revenue"</span>
+        </p>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 1vh, 12px);
+            max-width: 750px;
+          "
+          class="reveal-scale"
+        >
+          <div
+            class="card"
+            style="
+              border-left: 3px solid var(--accent-violet);
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            "
+          >
+            <span class="badge badge-cyan">1</span>
+            <p style="margin: 0">
+              LLM calls <code>list_schemas</code> &rarr; discovers available
+              schemas
+            </p>
+          </div>
+          <div
+            class="card"
+            style="
+              border-left: 3px solid var(--accent-violet);
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            "
+          >
+            <span class="badge badge-cyan">2</span>
+            <p style="margin: 0">
+              LLM calls <code>list_objects</code> &rarr; gets real table & view
+              names
+            </p>
+          </div>
+          <div
+            class="card"
+            style="
+              border-left: 3px solid var(--accent-violet);
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            "
+          >
+            <span class="badge badge-cyan">3</span>
+            <p style="margin: 0">
+              LLM calls <code>get_object_details</code> &rarr; columns, types,
+              constraints & indexes
+            </p>
+          </div>
+          <div
+            class="card"
+            style="
+              border-left: 3px solid var(--accent-amber);
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            "
+          >
+            <span class="badge badge-amber">4</span>
+            <p style="margin: 0">
+              LLM calls <code>explain_query</code> &rarr; validates query plan,
+              used to optimize the query
+            </p>
+          </div>
+          <div
+            class="card"
+            style="
+              border-left: 3px solid var(--accent-green);
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            "
+          >
+            <span class="badge badge-green">5</span>
+            <p style="margin: 0">
+              LLM calls <code>execute_sql</code> &rarr; runs query with access
+              control & safety parsing
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">07 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 12: pg_catalog
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">The Secret Weapon</div>
+        <h2 class="reveal">
+          <span class="pg">pg_catalog</span> - Postgres Knows Itself
+        </h2>
+        <p
+          class="reveal"
+          style="margin-bottom: var(--content-gap); max-width: 600px"
+        >
+          The MCP server doesn't need external config. It queries Postgres's own
+          metadata catalog for real-time, always-accurate schema info.
+        </p>
+        <div class="grid-3 reveal-scale" style="max-width: 950px">
+          <div class="card">
+            <h4 class="cyan">pg_class</h4>
+            <p>Complete map of all tables</p>
+          </div>
+          <div class="card">
+            <h4 class="cyan">pg_attribute</h4>
+            <p>Every column name & exact type</p>
+          </div>
+          <div class="card">
+            <h4 class="cyan">pg_constraint</h4>
+            <p>PKs, FKs, CHECK constraints</p>
+          </div>
+          <div class="card">
+            <h4 class="cyan">pg_index</h4>
+            <p>All indexes for query optimization</p>
+          </div>
+          <div class="card">
+            <h4 class="cyan">pg_namespace</h4>
+            <p>Namespaces (schemas) in the database</p>
+          </div>
+          <div class="card">
+            <h4 class="cyan">pg_description</h4>
+            <p>COMMENT ON annotations as docs</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">08 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 13: pg_catalog CODE
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Under the Hood</div>
+        <h2 class="reveal">
+          What the MCP Server <span class="cyan">Queries</span>
+        </h2>
+        <div class="grid-3 reveal-scale" style="max-width: 950px">
+          <div>
+            <div class="code-block"><span class="cm">-- list_schemas</span>
+<span class="kw">SELECT</span>
+  schema_name,
+  schema_owner,
+  <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> schema_name <span class="kw">LIKE</span> <span class="str">'pg_%'</span>
+      <span class="kw">THEN</span> <span class="str">'System Schema'</span>
+    <span class="kw">WHEN</span> schema_name =
+      <span class="str">'information_schema'</span>
+      <span class="kw">THEN</span> <span class="str">'System Info Schema'</span>
+    <span class="kw">ELSE</span> <span class="str">'User Schema'</span>
+  <span class="kw">END</span> <span class="kw">AS</span> schema_type
+<span class="kw">FROM</span> <span class="fn">information_schema.schemata</span>
+<span class="kw">ORDER BY</span> schema_type,
+  schema_name;</div>
+          </div>
+          <div>
+            <div class="code-block"><span class="cm">-- list_objects</span>
+<span class="kw">SELECT</span>
+  <span class="kw">CASE</span> c.relkind
+    <span class="kw">WHEN</span> <span class="str">'r'</span> <span class="kw">THEN</span> <span class="str">'table'</span>
+    <span class="kw">WHEN</span> <span class="str">'v'</span> <span class="kw">THEN</span> <span class="str">'view'</span>
+  <span class="kw">END</span> <span class="kw">AS</span> object_type,
+  n.nspname <span class="kw">AS</span> table_schema,
+  c.relname <span class="kw">AS</span> table_name,
+  d.description <span class="kw">AS</span> comment
+<span class="kw">FROM</span> <span class="fn">pg_catalog.pg_class</span> c
+<span class="kw">JOIN</span> <span class="fn">pg_catalog.pg_namespace</span> n
+  <span class="kw">ON</span> n.oid = c.relnamespace
+<span class="kw">LEFT JOIN</span> <span class="fn">pg_catalog.pg_description</span> d
+  <span class="kw">ON</span> d.objoid = c.oid
+  <span class="kw">AND</span> d.objsubid = <span class="num">0</span>
+<span class="kw">WHERE</span> n.nspname = <span class="str">$1</span>
+  <span class="kw">AND</span> c.relkind <span class="kw">IN</span> (<span class="str">'r'</span>,<span class="str">'v'</span>)
+<span class="kw">ORDER BY</span> c.relname;</div>
+          </div>
+          <div>
+            <div class="code-block"><span class="cm">-- get_object_details</span>
+<span class="kw">SELECT</span>
+  column_name, data_type,
+  is_nullable, column_default
+<span class="kw">FROM</span> <span class="fn">information_schema.columns</span>
+<span class="kw">WHERE</span> table_schema = <span class="str">$1</span>
+  <span class="kw">AND</span> table_name = <span class="str">$2</span>
+<span class="kw">ORDER BY</span> ordinal_position;</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">09 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 14: EXPLAIN — BAD QUERY
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Query-Optimization</div>
+        <h2 class="reveal">
+          EXPLAIN: <span class="red">Before</span> Optimization
+        </h2>
+        <div class="grid-2 reveal-scale" style="max-width: 950px">
+          <div>
+            <div class="code-block"><span class="cm">-- LLM's initial query</span>
+<span class="kw">SELECT</span> c.full_name,
+       <span class="fn">SUM</span>(o.total_price)
+<span class="kw">FROM</span>   app_customers c
+<span class="kw">JOIN</span>   customer_orders o
+       <span class="kw">ON</span> c.id = o.customer_id
+<span class="err">GROUP BY c.full_name
+ORDER BY total DESC;</span></div>
+          </div>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: clamp(6px, 1vh, 10px);
+            "
+          >
+            <div class="card" style="border-left: 3px solid var(--accent-red)">
+              <p><span class="red">Seq Scan</span> on ~500K rows</p>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--accent-red)">
+              <p><span class="red">No date filter</span> - scans ALL orders</p>
+            </div>
+            <div class="card" style="border-left: 3px solid var(--accent-red)">
+              <p><span class="red">~2,999 ms</span> execution time</p>
+            </div>
+            <p class="dim" style="font-size: var(--small-size)">
+              The LLM reads EXPLAIN output and rewrites&hellip;
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">10 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 15: EXPLAIN — OPTIMIZED
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Query-Optimization</div>
+        <h2 class="reveal">
+          EXPLAIN: <span class="green">After</span> Optimization
+        </h2>
+        <div class="grid-2 reveal-scale" style="max-width: 950px">
+          <div>
+            <div class="code-block"><span class="cm">-- LLM's optimized query</span>
+<span class="kw">SELECT</span> c.full_name,
+       <span class="fn">SUM</span>(o.total_price)
+<span class="kw">FROM</span>   app_customers c
+<span class="kw">JOIN</span>   customer_orders o
+       <span class="kw">ON</span> c.id = o.customer_id
+<span class="fn">WHERE</span>  o.created_at >= <span class="fn">NOW</span>() - <span class="str">INTERVAL '90 days'</span>
+<span class="kw">GROUP BY</span> c.id, c.full_name
+<span class="kw">ORDER BY</span> total <span class="kw">DESC</span>
+<span class="fn">LIMIT</span> <span class="num">10</span>;</div>
+          </div>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: clamp(6px, 1vh, 10px);
+            "
+          >
+            <div
+              class="card"
+              style="border-left: 3px solid var(--accent-green)"
+            >
+              <p><span class="green">Index Scan</span> on ~3,000 rows</p>
+            </div>
+            <div
+              class="card"
+              style="border-left: 3px solid var(--accent-green)"
+            >
+              <p><span class="green">Date filter</span> + LIMIT added</p>
+            </div>
+            <div
+              class="card"
+              style="border-left: 3px solid var(--accent-green)"
+            >
+              <p><span class="green">20 ms</span> execution time</p>
+            </div>
+            <div
+              class="card"
+              style="
+                border-left: 3px solid var(--accent-green);
+                text-align: center;
+              "
+            >
+              <h4 class="green" style="font-size: var(--h3-size)">
+                ~150x faster
+              </h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">11 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 16: SECURITY
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Security</div>
+        <h2 class="reveal"><span class="green">Guard</span> Rails</h2>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 1vh, 10px);
+            max-width: 750px;
+          "
+          class="reveal-scale"
+        >
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: clamp(8px, 1.5vw, 16px);
+              border-left: 3px solid var(--accent-cyan);
+            "
+          >
+            <span style="font-size: clamp(18px, 2.5vw, 28px)">&#128274;</span>
+            <div>
+              <h4 class="cyan">Read-Only Database Role</h4>
+              <p>
+                GRANT SELECT only. Even DROP TABLE gets rejected by Postgres.
+              </p>
+            </div>
+          </div>
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: clamp(8px, 1.5vw, 16px);
+              border-left: 3px solid var(--accent-violet);
+            "
+          >
+            <span style="font-size: clamp(18px, 2.5vw, 28px)">&#128737;</span>
+            <div>
+              <h4 class="violet">Row-Level Security (RLS)</h4>
+              <p>
+                Multi-tenant isolation at the engine level. No SQL injection
+                bypass.
+              </p>
+            </div>
+          </div>
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: clamp(8px, 1.5vw, 16px);
+              border-left: 3px solid var(--accent-green);
+            "
+          >
+            <span style="font-size: clamp(18px, 2.5vw, 28px)">&#128220;</span>
+            <div>
+              <h4 class="green">
+                Safe SQL Execution (<code>execute_sql</code>)
+              </h4>
+              <p>
+                Configurable access control, read-only mode, safe SQL parsing,
+                and statement_timeout.
+              </p>
+            </div>
+          </div>
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: clamp(8px, 1.5vw, 16px);
+              border-left: 3px solid var(--accent-amber);
+            "
+          >
+            <span style="font-size: clamp(18px, 2.5vw, 28px)">&#128202;</span>
+            <div>
+              <h4 class="amber">Audit Logging + Rate Limits</h4>
+              <p>
+                Every query logged with context. Rate limiting and statement_timeout enforced.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">12 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 17: SECURITY CODE
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Security in Practice</div>
+        <h2 class="reveal">Read-Only Role <span class="cyan">Setup</span></h2>
+        <div class="code-block reveal-scale" style="max-width: 900px"><span class="cm">-- Create a dedicated read-only role for MCP</span>
+<span class="kw">CREATE ROLE</span> mcp_reader <span class="kw">LOGIN PASSWORD</span> <span class="str">'...'</span>;
+<span class="kw">GRANT CONNECT ON DATABASE</span> mydb <span class="kw">TO</span> mcp_reader;
+<span class="kw">GRANT USAGE ON SCHEMA</span> public <span class="kw">TO</span> mcp_reader;
+<span class="kw">GRANT SELECT ON ALL TABLES IN SCHEMA</span> public <span class="kw">TO</span> mcp_reader;
+
+<span class="cm">-- Multi-tenant isolation with RLS</span>
+<span class="kw">ALTER TABLE</span> customer_orders <span class="kw">ENABLE ROW LEVEL SECURITY</span>;
+
+<span class="kw">CREATE POLICY</span> tenant_isolation <span class="kw">ON</span> customer_orders
+  <span class="kw">FOR SELECT USING</span> (
+    tenant_id = current_setting(<span class="str">'app.tenant_id'</span>)::<span class="kw">int</span>
+  );</div>
+      </div>
+      <div class="slide-num">13 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 18: FULL ARCHITECTURE
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content" style="align-items: center">
+        <div class="section-label reveal" style="text-align: center">
+          Architecture
+        </div>
+        <h2 class="reveal" style="text-align: center">
+          How It All Fits Together
+        </h2>
+        <svg
+          class="reveal-scale"
+          width="100%"
+          viewBox="0 0 700 320"
+          style="
+            max-width: 1100px;
+            max-height: min(60vh, 450px);
+            font-family: &quot;Outfit&quot;, sans-serif;
+          "
+        >
+          <rect
+            x="10"
+            y="130"
+            width="100"
+            height="60"
+            rx="10"
+            fill="#0d1526"
+            stroke="#4a90c4"
+            stroke-width="1.2"
+          />
+          <text
+            x="60"
+            y="155"
+            fill="#e8ecf4"
+            text-anchor="middle"
+            font-size="10"
+            font-weight="600"
+          >
+            User
+          </text>
+          <text
+            x="60"
+            y="172"
+            fill="#4a5a74"
+            text-anchor="middle"
+            font-size="8"
+          >
+            "Top 5 customers"
+          </text>
+
+          <rect
+            x="145"
+            y="110"
+            width="120"
+            height="100"
+            rx="10"
+            fill="#0d1526"
+            stroke="#a78bfa"
+            stroke-width="1.2"
+          />
+          <text
+            x="205"
+            y="132"
+            fill="#a78bfa"
+            text-anchor="middle"
+            font-size="9"
+            font-weight="600"
+          >
+            MCP CLIENT
+          </text>
+          <rect
+            x="158"
+            y="142"
+            width="94"
+            height="26"
+            rx="6"
+            fill="rgba(167,139,250,0.12)"
+          />
+          <text
+            x="205"
+            y="159"
+            fill="#e8ecf4"
+            text-anchor="middle"
+            font-size="9"
+          >
+            LLM
+          </text>
+          <text
+            x="205"
+            y="186"
+            fill="#4a5a74"
+            text-anchor="middle"
+            font-size="7"
+          >
+            Claude Desktop, IDEs
+          </text>
+
+          <line
+            x1="110"
+            y1="160"
+            x2="145"
+            y2="160"
+            stroke="#4a5a74"
+            stroke-width="1.2"
+            marker-end="url(#arw)"
+          />
+
+          <rect
+            x="300"
+            y="145"
+            width="70"
+            height="30"
+            rx="6"
+            fill="none"
+            stroke="#4a5a74"
+            stroke-width="0.8"
+            stroke-dasharray="4"
+          />
+          <text
+            x="335"
+            y="164"
+            fill="#4a5a74"
+            text-anchor="middle"
+            font-size="7"
+          >
+            JSON-RPC 2.0
+          </text>
+          <line
+            x1="265"
+            y1="160"
+            x2="300"
+            y2="160"
+            stroke="#a78bfa"
+            stroke-width="1.2"
+            marker-end="url(#arw)"
+          />
+
+          <rect
+            x="405"
+            y="80"
+            width="130"
+            height="180"
+            rx="10"
+            fill="#0d1526"
+            stroke="#39ff7f"
+            stroke-width="1.2"
+          />
+          <text
+            x="470"
+            y="100"
+            fill="#39ff7f"
+            text-anchor="middle"
+            font-size="9"
+            font-weight="600"
+          >
+            MCP SERVER
+          </text>
+          <text x="470" y="112" fill="#7a8ba8" text-anchor="middle" font-size="7">pg-airman-mcp</text>
+          <rect
+            x="418"
+            y="122"
+            width="104"
+            height="20"
+            rx="4"
+            fill="rgba(57,255,127,0.08)"
+          />
+          <text
+            x="470"
+            y="136"
+            fill="#e8ecf4"
+            text-anchor="middle"
+            font-size="8"
+          >
+            list_schemas
+          </text>
+          <rect
+            x="418"
+            y="146"
+            width="104"
+            height="20"
+            rx="4"
+            fill="rgba(57,255,127,0.08)"
+          />
+          <text
+            x="470"
+            y="160"
+            fill="#e8ecf4"
+            text-anchor="middle"
+            font-size="8"
+          >
+            list_objects
+          </text>
+          <rect
+            x="418"
+            y="170"
+            width="104"
+            height="20"
+            rx="4"
+            fill="rgba(57,255,127,0.08)"
+          />
+          <text
+            x="470"
+            y="184"
+            fill="#e8ecf4"
+            text-anchor="middle"
+            font-size="8"
+          >
+            get_object_details
+          </text>
+          <rect
+            x="418"
+            y="194"
+            width="104"
+            height="20"
+            rx="4"
+            fill="rgba(255,176,32,0.08)"
+          />
+          <text
+            x="470"
+            y="208"
+            fill="#e8ecf4"
+            text-anchor="middle"
+            font-size="8"
+          >
+            explain_query
+          </text>
+          <rect
+            x="418"
+            y="218"
+            width="104"
+            height="20"
+            rx="4"
+            fill="rgba(0,229,255,0.08)"
+          />
+          <text
+            x="470"
+            y="232"
+            fill="#e8ecf4"
+            text-anchor="middle"
+            font-size="8"
+          >
+            execute_sql
+          </text>
+          <line
+            x1="370"
+            y1="160"
+            x2="405"
+            y2="160"
+            stroke="#39ff7f"
+            stroke-width="1.2"
+            marker-end="url(#arw)"
+          />
+
+          <rect
+            x="575"
+            y="105"
+            width="110"
+            height="110"
+            rx="10"
+            fill="#0d1526"
+            stroke="#ffb020"
+            stroke-width="1.2"
+          />
+          <text
+            x="630"
+            y="128"
+            fill="#ffb020"
+            text-anchor="middle"
+            font-size="9"
+            font-weight="600"
+          >
+            Postgres
+          </text>
+          <text
+            x="630"
+            y="148"
+            fill="#7a8ba8"
+            text-anchor="middle"
+            font-size="8"
+          >
+            pg_catalog
+          </text>
+          <text
+            x="630"
+            y="164"
+            fill="#7a8ba8"
+            text-anchor="middle"
+            font-size="8"
+          >
+            pg_stats
+          </text>
+          <text
+            x="630"
+            y="180"
+            fill="#7a8ba8"
+            text-anchor="middle"
+            font-size="8"
+          >
+            User Tables
+          </text>
+          <text
+            x="630"
+            y="196"
+            fill="#7a8ba8"
+            text-anchor="middle"
+            font-size="8"
+          >
+            EXPLAIN
+          </text>
+          <line
+            x1="535"
+            y1="160"
+            x2="575"
+            y2="160"
+            stroke="#ffb020"
+            stroke-width="1.2"
+            marker-end="url(#arw)"
+          />
+          <defs>
+            <marker
+              id="arw"
+              markerWidth="7"
+              markerHeight="5"
+              refX="7"
+              refY="2.5"
+              orient="auto"
+            >
+              <polygon points="0 0, 7 2.5, 0 5" fill="#4a5a74" />
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <div class="slide-num">14 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 19: DEMO
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Let's Try It Live</div>
+        <h2 class="reveal">
+          <span>Demo Time</span>
+        </h2>
+        <div class="code-block reveal-scale" style="max-width: 900px"><span class="cm"># Configure Claude Desktop (or any MCP client)</span>
+<span class="cm"># ~/Library/Application Support/Claude/claude_desktop_config.json</span>
+
+{
+  <span class="str">"mcpServers"</span>: {
+    <span class="str">"postgres"</span>: {
+      <span class="str">"command"</span>: <span class="str">"docker"</span>,
+      <span class="str">"args"</span>: [
+        <span class="str">"run"</span>, <span class="str">"-i"</span>, <span class="str">"--rm"</span>,
+        <span class="str">"-e"</span>, <span class="str">"AIRMAN_MCP_DATABASE_URL"</span>,
+        <span class="str">"enterprisedb/pg-airman-mcp"</span>,
+        <span class="str">"--access-mode=unrestricted"</span>
+      ],
+      <span class="str">"env"</span>: {
+        <span class="str">"AIRMAN_MCP_DATABASE_URL"</span>:
+          <span class="str">"postgresql://mcp_reader:demo@localhost:5432/demo"</span>
+      }
+    }
+  }
+}
+
+<span class="cm"># Restart Claude Desktop. Ask anything!</span>
+<span class="cm"># Use --access-mode=restricted for production</span></div>
+      </div>
+      <div class="slide-num"></div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 20: THE REAL PROBLEM — SILENTLY WRONG
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">The Real Problem</div>
+        <h2 class="reveal">
+          It Runs. It Returns. It's <span class="red">Wrong</span>.
+        </h2>
+        <p
+          class="reveal"
+          style="max-width: 700px; margin-bottom: var(--content-gap)"
+        >
+          Ask an LLM <span class="amber">"what's our revenue this month?"</span> against a real
+          production schema. The SQL executes fine. The number looks
+          plausible. It's <strong class="red">silently wrong</strong>.
+        </p>
+        <div class="grid-2 reveal-scale">
+          <div class="vs-panel vs-bad">
+            <h4
+              class="red"
+              style="font-size: var(--body-size); margin-bottom: 8px"
+            >
+              What the LLM doesn't know
+            </h4>
+            <div class="code-block"><span class="cm">-- LLM's guess</span>
+<span class="kw">SELECT SUM</span>(o.total_price)
+<span class="kw">FROM</span>   <span class="fn">customer_orders</span> o
+<span class="kw">WHERE</span>  o.created_at >= <span class="str">'2026-04-01'</span></div>
+            <ul style="margin-top: 8px; font-size: var(--small-size); padding-left: 16px; list-style: none">
+              <li><span class="red">&#10007;</span> Includes cancelled &amp; refunded orders</li>
+              <li><span class="red">&#10007;</span> Misses soft-delete filter <code>is_deleted = false</code></li>
+            </ul>
+          </div>
+          <div class="vs-panel vs-good">
+            <h4
+              class="green"
+              style="font-size: var(--body-size); margin-bottom: 8px"
+            >
+              What the query should be
+            </h4>
+            <div class="code-block"><span class="cm">-- Correct query</span>
+<span class="kw">SELECT SUM</span>(o.total_price)
+<span class="kw">FROM</span>   <span class="fn">customer_orders</span> o
+<span class="kw">WHERE</span>  o.created_at >= <span class="str">'2026-04-01'</span>
+  <span class="kw">AND</span> o.status != <span class="str">'cancelled'</span>
+  <span class="kw">AND</span> o.is_deleted = <span class="kw">false</span>
+  <span class="kw">AND</span> o.is_refunded = <span class="kw">false</span></div>
+            <p style="margin-top: 8px; font-size: var(--small-size)">
+              <span class="green">Tribal knowledge</span> that lives in people's heads, not in the schema
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">15 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 21: CUSTOM MCP SERVER WITH FASTMCP
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Solution</div>
+        <h2 class="reveal">
+          Custom MCP Server with <span class="green">FastMCP</span>
+        </h2>
+        <p
+          class="reveal"
+          style="max-width: 700px; margin-bottom: var(--content-gap)"
+        >
+          Encode your <strong>business logic</strong> into an MCP tool.
+          The LLM calls it instead of guessing the SQL.
+        </p>
+        <div class="reveal-scale" style="max-width: 800px">
+          <div class="code-block"><span class="cm"># revenue_mcp.py</span>
+<span class="kw">from</span> fastmcp <span class="kw">import</span> FastMCP
+<span class="kw">import</span> psycopg2
+
+mcp = FastMCP(<span class="str">"revenue-server"</span>)
+
+<span class="fn">@mcp.tool</span>()
+<span class="kw">def</span> <span class="fn">get_monthly_revenue</span>(month: str, year: int) -> dict:
+    <span class="str">"""Get actual revenue excluding cancelled,
+    refunded, and soft-deleted orders."""</span>
+    conn = psycopg2.connect(DB_URL)
+    cur = conn.cursor()
+    cur.execute(<span class="str">"""
+        SELECT SUM(o.total_price)
+        FROM   customer_orders o
+        WHERE  DATE_TRUNC('month', o.created_at)
+               = DATE_TRUNC('month', %s::date)
+        AND    o.status != 'cancelled'
+        AND    o.is_deleted = false
+        AND    o.is_refunded = false
+    """</span>, [<span class="str">f"</span>{year}-{month}-01<span class="str">"</span>])
+    result = cur.fetchone()
+    <span class="kw">return</span> {<span class="str">"revenue"</span>: float(result[<span class="num">0</span>] <span class="kw">or</span> <span class="num">0</span>)}
+
+<span class="kw">if</span> __name__ == <span class="str">"__main__"</span>:
+    mcp.run()</div>
+        </div>
+      </div>
+      <div class="slide-num">16 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 22: HYBRID APPROACH — WHY IT WORKS
+     =========================================== -->
+    <section
+      class="slide"
+      style="
+        background:
+          radial-gradient(
+            ellipse at 70% 30%,
+            rgba(167, 139, 250, 0.08) 0%,
+            transparent 50%
+          ),
+          var(--bg-primary);
+      "
+    >
+      <div class="slide-content">
+        <div class="section-label reveal">Hybrid Approach</div>
+        <h2 class="reveal">
+          <span class="cyan">Postgres MCP</span> +
+          <span class="green">Custom MCP</span>
+        </h2>
+        <div
+          style="
+            display: flex;
+            gap: clamp(12px, 2vw, 24px);
+            max-width: 900px;
+            align-items: stretch;
+          "
+          class="reveal-scale"
+        >
+          <div class="card" style="flex: 1; border-left: 3px solid var(--accent-cyan); text-align: center">
+            <h4 class="cyan" style="font-size: var(--body-size); margin-bottom: 8px">Postgres MCP</h4>
+            <p style="margin: 0; font-size: var(--small-size)">Schema, tables, columns, FKs</p>
+            <div class="sep" style="margin: 8px auto; width: 40px"></div>
+            <p class="dim" style="margin: 0; font-size: var(--small-size)"><em>"What exists in the database"</em></p>
+          </div>
+          <div style="display: flex; align-items: center; font-size: clamp(20px, 2.5vw, 32px); color: var(--text-dim)">+</div>
+          <div class="card" style="flex: 1; border-left: 3px solid var(--accent-green); text-align: center">
+            <h4 class="green" style="font-size: var(--body-size); margin-bottom: 8px">Custom MCP</h4>
+            <p style="margin: 0; font-size: var(--small-size)">Business logic, filters, compliance</p>
+            <div class="sep" style="margin: 8px auto; width: 40px"></div>
+            <p class="dim" style="margin: 0; font-size: var(--small-size)"><em>"What the data actually means"</em></p>
+          </div>
+        </div>
+        <ul
+          class="check-list reveal"
+          style="max-width: 700px; margin-top: var(--content-gap)"
+        >
+          <li>
+            <span class="check">&#10003;</span>
+            Legacy schemas with cryptic names &rarr; <strong class="cyan">Postgres MCP</strong> discovers them live
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            Soft-deletes, status flags, tribal joins &rarr; <strong class="green">Custom MCP</strong> encodes the rules
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            LLM picks the right tool for the question &rarr; no guessing/ hallucination
+          </li>
+        </ul>
+      </div>
+      <div class="slide-num">17 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 23: MCP VS ALTERNATIVES
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">Context Strategies</div>
+        <h2 class="reveal">Why Not Just<span class="amber">...</span></h2>
+        <table class="reveal-scale" style="max-width: 950px">
+          <thead>
+            <tr>
+              <th>Approach</th>
+              <th>Freshness</th>
+              <th>Scalability</th>
+              <th>Verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Paste schema in prompt</td>
+              <td><span class="red">Stale instantly</span></td>
+              <td><span class="red">Wastes tokens</span></td>
+              <td class="dim">Quick hack only</td>
+            </tr>
+            <tr>
+              <td>RAG over docs</td>
+              <td><span class="amber">Embeddings drift from schema</span></td>
+              <td><span class="amber">Good</span></td>
+              <td class="dim">Good for semantics, not structure</td>
+            </tr>
+            <tr>
+              <td>Fine-tuned model</td>
+              <td><span class="red">Stale on deploy</span></td>
+              <td><span class="amber">Expensive</span></td>
+              <td class="dim">Overkill for schema</td>
+            </tr>
+            <tr>
+              <td><strong class="cyan">MCP (live connection)</strong></td>
+              <td><span class="green">Always current</span></td>
+              <td><span class="green">Composable</span></td>
+              <td><strong class="green">Best for structure</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="slide-num">18 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 24: SUMMARY / CLOSING
+     =========================================== -->
+    <section
+      class="slide"
+      style="
+        background:
+          radial-gradient(
+            ellipse at 20% 80%,
+            rgba(51, 103, 145, 0.2) 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 80% 20%,
+            rgba(0, 229, 255, 0.08) 0%,
+            transparent 50%
+          ),
+          var(--bg-primary);
+      "
+    >
+      <div class="slide-content">
+        <div class="section-label reveal" style="text-align: center">
+          Key Takeaways
+        </div>
+        <h2 class="reveal" style="text-align: center">
+          From <span class="red">Blind Guessing</span> to<br /><span
+            class="green"
+            >Data-Aware Intelligence</span
+          >
+        </h2>
+        <div
+          class="sep reveal"
+          style="margin: clamp(8px, 1.5vh, 16px) auto"
+        ></div>
+        <ul
+          class="check-list reveal-scale"
+          style="max-width: 700px; margin: 0 auto"
+        >
+          <li>
+            <span class="check">&#10003;</span> LLMs hallucinate SQL because
+            they <strong>lack live database context</strong>
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <strong class="violet">MCP</strong> is a universal protocol
+            connecting LLMs to external data
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <strong class="green">pg-airman-mcp</strong> uses
+            <strong class="cyan">pg_catalog</strong> for real-time schema
+            discovery
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <strong class="green">Custom MCP servers</strong> (FastMCP) encode
+            business logic, soft-deletes, and tribal knowledge
+          </li>
+          <li>
+            <span class="check">&#10003;</span>
+            <strong class="cyan">Postgres MCP</strong> +
+            <strong class="green">Custom MCP</strong> = the hybrid approach
+            for <strong>real enterprise schemas</strong>
+          </li>
+        </ul>
+        <div
+          class="title-meta reveal"
+          style="justify-content: center; margin-top: clamp(12px, 2vh, 24px)"
+        >
+          <span class="badge badge-cyan">Postgres MCP</span>
+          <span class="badge badge-green">Custom MCP</span>
+          <span class="badge badge-amber">FastMCP</span>
+          <span
+            class="badge"
+            style="
+              background: rgba(74, 144, 196, 0.12);
+              color: var(--pg-blue-bright);
+              border-color: rgba(74, 144, 196, 0.3);
+            "
+            >Postgres</span
+          >
+        </div>
+      </div>
+      <div class="slide-num">19 / 23</div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE 25: REFERENCES
+     =========================================== -->
+    <section class="slide">
+      <div class="slide-content">
+        <div class="section-label reveal">References</div>
+        <h2 class="reveal">Resources & <span class="cyan">Links</span></h2>
+        <div class="sep reveal"></div>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 1vh, 10px);
+            max-width: 800px;
+            font-size: clamp(22px, 2.8vw, 36px);
+          "
+          class="reveal-scale"
+        >
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              border-left: 3px solid var(--accent-cyan);
+            "
+          >
+            <span class="badge badge-cyan">MCP</span>
+            <p style="margin: 0; font-size: clamp(14px, 1.4vw, 18px)">
+              Model Context Protocol Specification -
+              <a href="https://modelcontextprotocol.io" target="_blank" style="color:var(--accent-cyan); text-decoration:none;"><code>modelcontextprotocol.io</code></a>
+            </p>
+          </div>
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              border-left: 3px solid var(--accent-green);
+            "
+          >
+            <span class="badge badge-green">Airman</span>
+            <p style="margin: 0; font-size: clamp(14px, 1.4vw, 18px)">
+              pg-airman-mcp -
+              <a href="https://github.com/EnterpriseDB/pg-airman-mcp" target="_blank" style="color:var(--accent-cyan); text-decoration:none;"><code>github.com/EnterpriseDB/pg-airman-mcp</code></a>
+            </p>
+          </div>
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              border-left: 3px solid var(--accent-amber);
+            "
+          >
+            <span class="badge badge-amber">pgvector</span>
+            <p style="margin: 0; font-size: clamp(14px, 1.4vw, 18px)">
+              Vector Similarity Search for Postgres -
+              <a href="https://github.com/pgvector/pgvector" target="_blank" style="color:var(--accent-cyan); text-decoration:none;"><code>github.com/pgvector/pgvector</code></a>
+            </p>
+          </div>
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              border-left: 3px solid var(--pg-blue-bright);
+            "
+          >
+            <span
+              class="badge"
+              style="
+                background: rgba(74, 144, 196, 0.12);
+                color: var(--pg-blue-bright);
+                border: 1px solid rgba(74, 144, 196, 0.3);
+              "
+              >PG Docs</span
+            >
+            <p style="margin: 0; font-size: clamp(14px, 1.4vw, 18px)">
+              PostgreSQL System Catalogs -
+              <a href="https://www.postgresql.org/docs/current/catalogs.html" target="_blank" style="color:var(--accent-cyan); text-decoration:none;"><code>postgresql.org/docs/current/catalogs.html</code></a>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num"></div>
+    </section>
+
+    <!-- ===========================================
+     SLIDE: LET'S CONNECT
+     =========================================== -->
+    <section
+      class="slide"
+      style="
+        background:
+          radial-gradient(
+            ellipse at 25% 75%,
+            rgba(51, 103, 145, 0.2) 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 75% 25%,
+            rgba(167, 139, 250, 0.08) 0%,
+            transparent 50%
+          ),
+          var(--bg-primary);
+      "
+    >
+      <div
+        class="slide-content"
+        style="
+          flex-direction: row;
+          align-items: center;
+          justify-content: center;
+          gap: clamp(20px, 3vw, 40px);
+        "
+      >
+        <div style="flex: 0 0 auto; max-width: 380px" class="reveal">
+          <div class="section-label" style="text-align: left">Thank You</div>
+          <h2 style="margin-bottom: clamp(2px, 0.5vh, 6px); text-align: left">
+            Yogesh Jain
+          </h2>
+          <p
+            style="
+              color: var(--accent-cyan);
+              font-family: var(--font-mono);
+              font-size: var(--small-size);
+              margin-bottom: clamp(12px, 2vh, 20px);
+              text-align: left;
+            "
+          >
+            Staff SDE @ EDB
+          </p>
+          <div class="sep" style="margin-left: 0"></div>
+          <h3
+            style="
+              color: var(--text-primary);
+              font-weight: 600;
+              margin-top: clamp(10px, 1.5vh, 16px);
+              margin-bottom: clamp(8px, 1vh, 14px);
+              font-size: var(--body-size);
+              text-align: left;
+            "
+          >
+            Let's connect to talk about:
+          </h3>
+          <div style="display: flex; flex-wrap: wrap; gap: clamp(4px, 0.8vw, 8px); max-width: 320px;">
+            <span class="badge badge-cyan">Observability</span>
+            <span class="badge badge-amber">Postgres</span>
+            <span class="badge" style="background:rgba(167,139,250,0.1); color:var(--accent-violet); border:1px solid rgba(167,139,250,0.2);">Kubernetes</span>
+            <span class="badge badge-green">CloudNativePG</span>
+            <span class="badge" style="background:rgba(167,139,250,0.1); color:var(--accent-violet); border:1px solid rgba(167,139,250,0.2);">Open Source</span>
+            <span class="badge badge-cyan">MCP</span>
+          </div>
+        </div>
+        <div style="flex:0 0 auto; display:flex; flex-direction:column; align-items:center; gap:clamp(6px, 1vh, 10px);" class="reveal-scale">
+          <a href="https://www.linkedin.com/in/yogeshjain96" target="_blank">
+            <img src="https://curiousone.in/slides/images/linkedin_qr.png" alt="LinkedIn QR Code" style="width:clamp(120px, 14vw, 180px); height:auto; border-radius:8px;">
+          </a>
+          <p class="dim" style="font-size:clamp(0.5rem, 0.8vw, 0.65rem); font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin:0;">Scan to connect</p>
+        </div>
+        <div
+          style="
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 1.2vh, 14px);
+          "
+          class="reveal-scale"
+        >
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: clamp(12px, 2vw, 20px);
+              padding: clamp(10px, 1.5vh, 16px) clamp(14px, 2vw, 22px);
+            "
+          >
+            <span style="font-size: clamp(22px, 2.8vw, 32px)"
+              >&#9993;&#65039;</span
+            >
+            <div>
+              <p
+                class="dim"
+                style="
+                  font-size: clamp(0.55rem, 0.9vw, 0.75rem);
+                  margin-bottom: 2px;
+                  font-weight: 600;
+                  letter-spacing: 0.05em;
+                  text-transform: uppercase;
+                "
+              >
+                Email
+              </p>
+              <p
+                style="
+                  color: var(--text-primary);
+                  font-family: var(--font-mono);
+                  font-size: clamp(0.65rem, 1.1vw, 0.9rem);
+                  margin: 0;
+                "
+              >
+                <a href="mailto:contactyogeshjain@gmail.com" target="_blank" style="color:var(--text-primary); text-decoration:none;">contactyogeshjain@gmail.com</a>
+              </p>
+            </div>
+          </div>
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: clamp(12px, 2vw, 20px);
+              padding: clamp(10px, 1.5vh, 16px) clamp(14px, 2vw, 22px);
+            "
+          >
+            <span style="font-size: clamp(22px, 2.8vw, 32px)">&#128279;</span>
+            <div>
+              <p
+                class="dim"
+                style="
+                  font-size: clamp(0.55rem, 0.9vw, 0.75rem);
+                  margin-bottom: 2px;
+                  font-weight: 600;
+                  letter-spacing: 0.05em;
+                  text-transform: uppercase;
+                "
+              >
+                LinkedIn
+              </p>
+              <p
+                style="
+                  color: var(--accent-cyan);
+                  font-family: var(--font-mono);
+                  font-size: clamp(0.65rem, 1.1vw, 0.9rem);
+                  margin: 0;
+                "
+              >
+                <a href="https://www.linkedin.com/in/yogeshjain96" target="_blank" style="color:var(--accent-cyan); text-decoration:none;">yogeshjain96</a>
+              </p>
+            </div>
+          </div>
+          <div
+            class="card"
+            style="
+              display: flex;
+              align-items: center;
+              gap: clamp(12px, 2vw, 20px);
+              padding: clamp(10px, 1.5vh, 16px) clamp(14px, 2vw, 22px);
+            "
+          >
+            <span style="font-size: clamp(22px, 2.8vw, 32px)">&#128279;</span>
+            <div>
+              <p
+                class="dim"
+                style="
+                  font-size: clamp(0.55rem, 0.9vw, 0.75rem);
+                  margin-bottom: 2px;
+                  font-weight: 600;
+                  letter-spacing: 0.05em;
+                  text-transform: uppercase;
+                "
+              >
+                Blog
+              </p>
+              <p
+                style="
+                  color: var(--accent-green);
+                  font-family: var(--font-mono);
+                  font-size: clamp(0.65rem, 1.1vw, 0.9rem);
+                  margin: 0;
+                "
+              >
+                <a href="https://curiousone.in" target="_blank" style="color:var(--accent-green); text-decoration:none;">curiousone.in</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num"></div>
+    </section>
+
+    <!-- ===========================================
+     JAVASCRIPT: SLIDE CONTROLLER
+     =========================================== -->
+    <script>
+      class SlidePresentation {
+        constructor() {
+          this.slides = document.querySelectorAll(".slide");
+          this.currentSlide = 0;
+          this.totalSlides = this.slides.length;
+          this.isScrolling = false;
+
+          this.setupIntersectionObserver();
+          this.setupKeyboardNav();
+          this.setupTouchNav();
+          this.setupWheelNav();
+          this.setupProgressBar();
+          this.setupNavDots();
+
+          /* Make first slide visible immediately */
+          this.slides[0].classList.add("visible");
+        }
+
+        /* === Intersection Observer: trigger .visible for animations === */
+        setupIntersectionObserver() {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("visible");
+                  const idx = [...this.slides].indexOf(entry.target);
+                  if (idx !== -1) {
+                    this.currentSlide = idx;
+                    this.updateProgressBar();
+                    this.updateNavDots();
+                  }
+                }
+              });
+            },
+            { threshold: 0.5 },
+          );
+
+          this.slides.forEach((s) => observer.observe(s));
+        }
+
+        /* === Keyboard: Arrow keys, Space, PgUp/PgDn === */
+        setupKeyboardNav() {
+          document.addEventListener("keydown", (e) => {
+            switch (e.key) {
+              case "ArrowDown":
+              case "ArrowRight":
+              case " ":
+              case "PageDown":
+                e.preventDefault();
+                this.goToSlide(this.currentSlide + 1);
+                break;
+              case "ArrowUp":
+              case "ArrowLeft":
+              case "PageUp":
+                e.preventDefault();
+                this.goToSlide(this.currentSlide - 1);
+                break;
+              case "Home":
+                e.preventDefault();
+                this.goToSlide(0);
+                break;
+              case "End":
+                e.preventDefault();
+                this.goToSlide(this.totalSlides - 1);
+                break;
+            }
+          });
+        }
+
+        /* === Touch / Swipe support === */
+        setupTouchNav() {
+          let startY = 0;
+          document.addEventListener("touchstart", (e) => {
+            startY = e.touches[0].clientY;
+          });
+          document.addEventListener("touchend", (e) => {
+            const diff = startY - e.changedTouches[0].clientY;
+            if (Math.abs(diff) > 50) {
+              this.goToSlide(this.currentSlide + (diff > 0 ? 1 : -1));
+            }
+          });
+        }
+
+        /* === Mouse wheel with debounce === */
+        setupWheelNav() {
+          document.addEventListener(
+            "wheel",
+            (e) => {
+              if (this.isScrolling) return;
+              this.isScrolling = true;
+              if (Math.abs(e.deltaY) > 30) {
+                this.goToSlide(this.currentSlide + (e.deltaY > 0 ? 1 : -1));
+              }
+              setTimeout(() => {
+                this.isScrolling = false;
+              }, 800);
+            },
+            { passive: true },
+          );
+        }
+
+        /* === Progress Bar === */
+        setupProgressBar() {
+          this.updateProgressBar();
+        }
+        updateProgressBar() {
+          const pct = (this.currentSlide / (this.totalSlides - 1)) * 100;
+          document.getElementById("progressBar").style.width = pct + "%";
+        }
+
+        /* === Nav Dots === */
+        setupNavDots() {
+          const nav = document.getElementById("navDots");
+          for (let i = 0; i < this.totalSlides; i++) {
+            const dot = document.createElement("button");
+            dot.className = "nav-dot" + (i === 0 ? " active" : "");
+            dot.setAttribute("aria-label", `Go to slide ${i + 1}`);
+            const h2 = this.slides[i].querySelector("h2");
+            const label = this.slides[i].querySelector(".section-label");
+            const title = (h2 ? h2.textContent.trim() : (label ? label.textContent.trim() : `Slide ${i + 1}`));
+            const tooltip = document.createElement("span");
+            tooltip.className = "nav-tooltip";
+            tooltip.textContent = title;
+            dot.appendChild(tooltip);
+            dot.addEventListener("click", () => this.goToSlide(i));
+            nav.appendChild(dot);
+          }
+          /* Show nav dots when mouse moves to right edge */
+          let hideTimeout;
+          document.addEventListener("mousemove", (e) => {
+            if (e.clientX < 40) {
+              nav.classList.add("visible");
+              clearTimeout(hideTimeout);
+            } else if (!nav.matches(":hover")) {
+              clearTimeout(hideTimeout);
+              hideTimeout = setTimeout(() => nav.classList.remove("visible"), 600);
+            }
+          });
+        }
+        updateNavDots() {
+          document.querySelectorAll(".nav-dot").forEach((d, i) => {
+            d.classList.toggle("active", i === this.currentSlide);
+          });
+        }
+
+        /* === Navigate to slide === */
+        goToSlide(n) {
+          if (n < 0 || n >= this.totalSlides) return;
+          this.currentSlide = n;
+          this.slides[n].scrollIntoView({ behavior: "smooth" });
+          this.updateProgressBar();
+          this.updateNavDots();
+        }
+      }
+
+      /* Auto-number all slides */
+      const allSlides = document.querySelectorAll(".slide");
+      const totalCount = allSlides.length;
+      allSlides.forEach((slide, i) => {
+        const numEl = slide.querySelector(".slide-num");
+        if (numEl)
+          numEl.textContent = `${String(i + 1).padStart(2, "0")} / ${totalCount}`;
+      });
+
+      /* Add logo + footer to every slide */
+      document.querySelectorAll(".slide").forEach((slide) => {
+        if (!slide.querySelector(".slide-logo")) {
+          const logo = document.createElement("img");
+          logo.src = "https://curiousone.in/slides/images/edb-logo.svg";
+          logo.alt = "EDB";
+          logo.className = "slide-logo";
+          slide.appendChild(logo);
+        }
+        if (!slide.querySelector(".slide-footer")) {
+          const footer = document.createElement("div");
+          footer.className = "slide-footer";
+          footer.innerHTML = "&copy; EDB 2026 - ALL RIGHTS RESERVED.";
+          slide.appendChild(footer);
+        }
+      });
+
+      /* Initialize */
+      new SlidePresentation();
+    </script>
+  </body>
+</html>
