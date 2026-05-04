@@ -11,10 +11,10 @@
       <details>
         <summary><u>Talk Details</u></summary>
         <p><strong>Title:</strong> Building Real-Time, Data-Aware Intelligence with Postgres & Model Context Protocol</p>
-        
-        Also wrote a **blog post** on the same topic - <a href="https://curiousone.in/blog/postgres-and-mcp/" target="_blank">here 🔗</a>
-        
-        More details in <a href="https://postgresconf.org/conferences/postgresconf_2026/program/proposals/building-real-time-data-aware-intelligence-with-postgres-model-context-protocol-mcp" target="_blank">postgresconf.org page here 🔗</a>
+
+        - Also wrote a **blog post** on the same topic - <a href="https://curiousone.in/blog/postgres-and-mcp/" target="_blank">here 🔗</a>
+        - More details in <a href="https://postgresconf.org/conferences/postgresconf_2026/program/proposals/building-real-time-data-aware-intelligence-with-postgres-model-context-protocol-mcp" target="_blank">postgresconf.org page here 🔗</a>
+        - EDB Event <a href="https://www.enterprisedb.com/event/postgres-conference-san-jose-2026" target="_blank">post here 🔗</a>
       </details>
 - year: "2025"
   events:
