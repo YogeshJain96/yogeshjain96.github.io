@@ -363,3 +363,5 @@ There are other ways to give LLMs database context. I get asked about other opti
 - [Model Context Protocol Specification](https://modelcontextprotocol.io)
 - [pg-airman-mcp](https://github.com/EnterpriseDB/pg-airman-mcp)
 - [PostgreSQL System Catalogs](https://www.postgresql.org/docs/current/catalogs.html)
+
+🚀 This blog also got published & featured 🌟 on [EDB Blog page](https://www.enterprisedb.com/blog/building-real-time-data-aware-intelligence-postgres-and-model-context-protocol)
